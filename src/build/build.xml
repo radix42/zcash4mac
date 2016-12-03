@@ -33,6 +33,10 @@
     <property name="build.dir"   value="build"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
     <property name="jar.dir"     value="${build.dir}/jars"/>
+	
+	<!-- props for the app bundler -->
+	<property name="appbundler.jar" value="antlib/appbundler-1.0.jar" />
+	<property name="osx.app.dir" value="${build.dir}/osxapp" />
 
     <property name="main-class"  value="com.vaklinov.zcashui.ZCashUI"/>
 
@@ -81,5 +85,32 @@
     	<delete dir="${classes.dir}"/>
 	</target>
 
+	<!-- ############################ -->
+	<!-- everything below this is for the mac bundler -->
+	<!-- ############################ -->
+	
+	<!-- get a handle on the environment -->
+	<property environment="env" />
+	
+	<!-- define the app bundler task -->
+	<taskdef name="bundleapp"
+	             classname="com.oracle.appbundler.AppBundlerTask"   
+	             classpath="${appbundler.jar}" />
+	
+	<!-- and the bundle target -->
+	<target name="osxbundle" depends="buildit">
+		<mkdir dir="${osx.app.dir}" />
+		<bundleapp 
+		  outputdirectory="${osx.app.dir}"
+		  name="${ant.project.name}" 
+		  displayname="${ant.project.name}"
+		  identifier="zcash.wallet.ui"
+		  mainclassname="${main-class}" >
+			<runtime dir="${env.JAVA_HOME}"/>
+			<classpath file="${jar.dir}/${ant.project.name}.jar" />
+	     </bundleapp>
+	</target>
+		
+	
 </project>
 
