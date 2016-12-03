@@ -153,7 +153,13 @@ public class OSUtil
 	public static String getSettingsDirectory()
 		throws IOException
 	{
-		File dir = new File(System.getProperty("user.home") + "/.ZCashSwingWalletUI");
+	    File userHome = new File(System.getProperty("user.home"));
+	    File dir;
+	    OS_TYPE os = getOSType();
+	    if (os == OS_TYPE.MAC_OS)
+	        dir = new File(userHome, "Library/Application Support/ZCashSwingWalletUI");
+	    else
+	        dir = new File(userHome + "/.ZCashSwingWalletUI");
 		if (!dir.exists())
 		{
 			dir.mkdirs();
