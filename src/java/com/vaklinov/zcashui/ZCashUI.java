@@ -59,7 +59,6 @@ import javax.swing.event.ChangeListener;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionException;
 
-
 /**
  * Main ZCash Window.
  *
@@ -316,13 +315,15 @@ public class ZCashUI
             System.out.println("Environment PATH: " + System.getenv("PATH"));
 
             ////////////////////////////////////////////////////////////
-            for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
-            {
-                System.out.println("Available look and feel: " + ui.getName() + " " + ui.getClassName());
-                if (ui.getName().equals("Nimbus"))
+            if (OSUtil.getOSType() != OSUtil.OS_TYPE.MAC_OS) {
+                for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
                 {
-                    UIManager.setLookAndFeel(ui.getClassName());
-                    break;
+                    System.out.println("Available look and feel: " + ui.getName() + " " + ui.getClassName());
+                    if (ui.getName().equals("Nimbus"))
+                    {
+                        UIManager.setLookAndFeel(ui.getClassName());
+                        break;
+                    }
                 }
             }
 
