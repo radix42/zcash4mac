@@ -325,7 +325,8 @@ public class ZCashUI
                         break;
                     }
                 }
-            }
+            } else 
+                System.setProperty("apple.laf.useScreenMenuBar", "true");
 
             /////////////////////////////////////////////////////
             ZCashUI ui = new ZCashUI();
