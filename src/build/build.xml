@@ -92,13 +92,27 @@
 	<!-- get a handle on the environment -->
 	<property environment="env" />
 	
+	<!-- fail if JAVA_HOME is not set -->
+	<target name="checkJavaHome">
+		<fail message="JAVA_HOME has to be set!">
+			<condition>
+				<or>
+					<equals arg1="${env.JAVA_HOME}" arg2="" />
+					<not>
+						<isset property="env.JAVA_HOME" />
+					</not>
+				</or>
+			</condition>
+		</fail>
+	</target>
+	
 	<!-- define the app bundler task -->
 	<taskdef name="bundleapp"
 	             classname="com.oracle.appbundler.AppBundlerTask"   
 	             classpath="${appbundler.jar}" />
 	
 	<!-- and the bundle target -->
-	<target name="osxbundle" depends="buildit">
+	<target name="osxbundle" depends="buildit,checkJavaHome">
 		<mkdir dir="${osx.app.dir}" />
 		<bundleapp 
 		  outputdirectory="${osx.app.dir}"
