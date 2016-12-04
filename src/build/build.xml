@@ -106,13 +106,24 @@
 		</fail>
 	</target>
 	
+	<!-- fail if not on OSX -->
+	<target name="checkOSX">
+		 <fail message="This target can only run on OSX">
+		    <condition>
+		    	  <not>
+		        <os family="mac"/>
+		    	  </not>
+		    	</condition>
+		 </fail>
+	</target>
+	
 	<!-- define the app bundler task -->
 	<taskdef name="bundleapp"
 	             classname="com.oracle.appbundler.AppBundlerTask"   
 	             classpath="${appbundler.jar}" />
 	
 	<!-- and the bundle target -->
-	<target name="osxbundle" depends="buildit,checkJavaHome">
+	<target name="osxbundle" depends="checkJavaHome,checkOSX,buildit">
 		<mkdir dir="${osx.app.dir}" />
 		<bundleapp 
 		  outputdirectory="${osx.app.dir}"
