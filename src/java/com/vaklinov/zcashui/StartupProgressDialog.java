@@ -2,13 +2,11 @@ package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -49,6 +47,7 @@ public class StartupProgressDialog extends JWindow {
         southPanel.add(progressBar, BorderLayout.NORTH);
         progressLabel.setText("Starting...");
         southPanel.add(progressLabel, BorderLayout.SOUTH);
+        setLocationRelativeTo(null);
         pack();
     }
     
