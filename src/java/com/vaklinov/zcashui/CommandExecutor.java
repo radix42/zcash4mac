@@ -50,6 +50,10 @@ public class CommandExecutor
 		this.args = args;
 	}		
 	
+	public void executeNoResult() throws IOException {
+	    Runtime.getRuntime().exec(args);
+	}
+	
 	public String execute()
 		throws IOException, InterruptedException
 	{

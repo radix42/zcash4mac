@@ -85,7 +85,7 @@ public class ZCashUI
     private AddressesPanel addresses;
     private SendCashPanel  sendPanel;
 
-    public ZCashUI()
+    public ZCashUI(ZCashClientCaller clientCaller)
         throws IOException, InterruptedException, WalletCallException
     {
         super("ZCash Swing Wallet UI 0.44 (beta)");
@@ -97,7 +97,7 @@ public class ZCashUI
 
         errorReporter = new StatusUpdateErrorReporter(this);
         installationObserver = new ZCashInstallationObserver(OSUtil.getProgramDirectory());
-        clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
+        this.clientCaller = clientCaller;
 
         // Build content
         JTabbedPane tabs = new JTabbedPane();
@@ -329,7 +329,11 @@ public class ZCashUI
                 System.setProperty("apple.laf.useScreenMenuBar", "true");
 
             /////////////////////////////////////////////////////
-            ZCashUI ui = new ZCashUI();
+            ZCashClientCaller clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
+            StartupProgressDialog startupBar = new StartupProgressDialog(clientCaller);
+            startupBar.setVisible(true);
+            startupBar.waitForStartup();
+            ZCashUI ui = new ZCashUI(clientCaller);
             ui.setVisible(true);
 
         } catch (InstallationDetectionException ide)

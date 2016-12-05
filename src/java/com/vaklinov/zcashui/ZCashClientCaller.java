@@ -91,8 +91,8 @@ public class ZCashClientCaller
 	}
 
 
-	// ZCash client program
-	private File zcashcli;
+	// ZCash client program and daemon
+	private File zcashcli,zcashd;
 
 
 	public ZCashClientCaller(String installDir)
@@ -113,8 +113,33 @@ public class ZCashClientCaller
 				"The ZCash installation directory " + installDir + " needs to contain " +
 				"the command line utilities zcashd and zcash-cli. zcash-cli is missing!");
 		}
+		
+		zcashd = new File(dir, "zcashd");
+		if (!zcashd.exists())
+		    zcashd = OSUtil.findZCashCommand("zcashd");
+		if (zcashd == null || (!zcashd.exists()))
+		    throw new IOException("zcash-cli exists but zcashd doesn't?  Check your installation!");
 	}
 
+	public synchronized void startDaemon() throws IOException,InterruptedException {
+	    CommandExecutor starter = new CommandExecutor(
+	            new String[] { zcashd.getCanonicalPath(),"--daemon"});
+	    starter.executeNoResult();
+	}
+	
+	public synchronized JsonObject getInfo() throws IOException,InterruptedException,WalletCallException {
+	    CommandExecutor infoGetter = new CommandExecutor(
+	            new String[] { zcashcli.getCanonicalPath(),"getinfo"});
+	    String info = infoGetter.execute();
+	    if (info.startsWith("error: "))
+	        info = info.substring(7);
+	    try {
+	        return Json.parse(info).asObject();
+	    } catch (ParseException pe){
+	        pe.printStackTrace();
+	        throw new IOException(pe);
+	    }
+	}
 
 	public synchronized WalletBalance getWalletInfo()
 		throws WalletCallException, IOException, InterruptedException
