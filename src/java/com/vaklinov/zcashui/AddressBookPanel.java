@@ -2,6 +2,8 @@ package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -24,6 +26,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -68,6 +71,7 @@ public class AddressBookPanel extends JPanel {
         
         deleteContactButton = new JButton("Delete contact");
         deleteContactButton.setEnabled(false);
+        deleteContactButton.addActionListener(new DeleteAddressActionListener());
         panel.add(deleteContactButton);
         
         return panel;
@@ -115,11 +119,36 @@ public class AddressBookPanel extends JPanel {
         }
     }
     
-    private void saveEntriesToDisk() throws IOException {
-        File addressBookFile = new File(OSUtil.getSettingsDirectory(),"addressBook.csv");
-        try (PrintWriter printWriter = new PrintWriter(new FileWriter(addressBookFile))) {
-            for (AddressBookEntry entry : entries) 
-                printWriter.println(entry.address+","+entry.name);
+    private void saveEntriesToDisk() {
+        try {
+            File addressBookFile = new File(OSUtil.getSettingsDirectory(),"addressBook.csv");
+            try (PrintWriter printWriter = new PrintWriter(new FileWriter(addressBookFile))) {
+                for (AddressBookEntry entry : entries) 
+                    printWriter.println(entry.address+","+entry.name);
+            }
+        } catch (IOException bad) {
+            System.out.println("Saving Address Book Failed!!!!");
+            bad.printStackTrace();
+        }
+    }
+    
+    private class DeleteAddressActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            int row = table.getSelectedRow();
+            if (row < 0)
+                return;
+            AddressBookEntry entry = entries.get(row);
+            entries.remove(row);
+            names.remove(entry.name);
+            deleteContactButton.setEnabled(false);
+            sendCashButton.setEnabled(false);
+            copyToClipboardButton.setEnabled(false);
+            table.repaint();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    saveEntriesToDisk();
+                }
+            });
         }
     }
 
@@ -140,6 +169,7 @@ public class AddressBookPanel extends JPanel {
             JMenuItem copyAddress = new JMenuItem("Copy address to clipboard");
             menu.add(copyAddress);
             JMenuItem deleteEntry = new JMenuItem("Delete "+entry.name+" from contacts");
+            deleteEntry.addActionListener(new DeleteAddressActionListener());
             menu.add(deleteEntry);
             menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
             e.consume();
