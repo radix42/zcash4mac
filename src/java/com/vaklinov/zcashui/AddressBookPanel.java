@@ -23,7 +23,9 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -62,6 +64,7 @@ public class AddressBookPanel extends JPanel {
         panel.setLayout(new FlowLayout(FlowLayout.CENTER, 3, 3));
         
         JButton newContactButton = new JButton("New contact...");
+        newContactButton.addActionListener(new NewContactActionListener());
         panel.add(newContactButton);
                 
         sendCashButton = new JButton("Send ZCash");
@@ -164,6 +167,38 @@ public class AddressBookPanel extends JPanel {
             AddressBookEntry entry = entries.get(row);
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(new StringSelection(entry.address), null);
+        }
+    }
+    
+    private class NewContactActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            String name = (String) JOptionPane.showInputDialog(AddressBookPanel.this,
+                    "Please enter the name of the contact:",
+                    "Add new contact step 1",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    "");
+            if (name == null || "".equals(name))
+                return; // cancelled
+                
+            String address = (String) JOptionPane.showInputDialog(AddressBookPanel.this,
+                    "Pleae enter the t-address or z-address of "+name,
+                    "Add new contact step 2",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    "");
+            if (address == null || "".equals(address))
+                return; // cancelled
+            entries.add(new AddressBookEntry(name,address));
+            table.invalidate();
+            table.repaint();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    saveEntriesToDisk();
+                }
+            });
         }
     }
 
