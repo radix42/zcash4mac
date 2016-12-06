@@ -2,6 +2,9 @@ package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -67,6 +70,7 @@ public class AddressBookPanel extends JPanel {
         
         copyToClipboardButton = new JButton("Copy address to clipboard");
         copyToClipboardButton.setEnabled(false);
+        copyToClipboardButton.addActionListener(new CopyToClipboardActionListener());
         panel.add(copyToClipboardButton);
         
         deleteContactButton = new JButton("Delete contact");
@@ -151,6 +155,17 @@ public class AddressBookPanel extends JPanel {
             });
         }
     }
+    
+    private class CopyToClipboardActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            int row = table.getSelectedRow();
+            if (row < 0)
+                return;
+            AddressBookEntry entry = entries.get(row);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(new StringSelection(entry.address), null);
+        }
+    }
 
     private class AddressMouseListener extends MouseAdapter {
 
@@ -167,6 +182,7 @@ public class AddressBookPanel extends JPanel {
             JMenuItem sendCash = new JMenuItem("Send ZCash to "+entry.name);
             menu.add(sendCash);
             JMenuItem copyAddress = new JMenuItem("Copy address to clipboard");
+            copyAddress.addActionListener(new CopyToClipboardActionListener());
             menu.add(copyAddress);
             JMenuItem deleteEntry = new JMenuItem("Delete "+entry.name+" from contacts");
             deleteEntry.addActionListener(new DeleteAddressActionListener());
