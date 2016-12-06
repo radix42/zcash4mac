@@ -1,6 +1,7 @@
 package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -10,12 +11,16 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
@@ -37,9 +42,28 @@ public class AddressBookPanel extends JPanel {
     
     private JTable table;
     
+    private JButton sendCashButton, deleteContactButton,copyToClipboardButton;
+    
     private JPanel buildButtonsPanel() {
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createEtchedBorder());
+        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 3, 3));
+        
+        JButton newContactButton = new JButton("New contact...");
+        panel.add(newContactButton);
+                
+        sendCashButton = new JButton("Send ZCash");
+        sendCashButton.setEnabled(false);
+        panel.add(sendCashButton);
+        
+        copyToClipboardButton = new JButton("Copy address to clipboard");
+        copyToClipboardButton.setEnabled(false);
+        panel.add(copyToClipboardButton);
+        
+        deleteContactButton = new JButton("Delete contact");
+        deleteContactButton.setEnabled(false);
+        panel.add(deleteContactButton);
+        
         return panel;
     }
 
@@ -50,6 +74,7 @@ public class AddressBookPanel extends JPanel {
         table.addColumn(nameColumn);
         table.addColumn(addressColumn);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // one at a time
+        table.getSelectionModel().addListSelectionListener(new AddressListSelectionListener());
         table.addMouseListener(new AddressMouseListener());
         JScrollPane scrollPane = new JScrollPane(table);
         return scrollPane;
@@ -90,8 +115,29 @@ public class AddressBookPanel extends JPanel {
             e.consume();
         }
     }
+    
+    private class AddressListSelectionListener implements ListSelectionListener {
 
-    class AddressBookTableModel extends AbstractTableModel {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            int row = table.getSelectedRow();
+            if (row < 0) {
+                sendCashButton.setEnabled(false);
+                deleteContactButton.setEnabled(false);
+                copyToClipboardButton.setEnabled(false);
+                return;
+            }
+            String name = entries.get(row).name;
+            sendCashButton.setText("Send ZCash to "+name);
+            sendCashButton.setEnabled(true);
+            deleteContactButton.setText("Delete contact "+name);
+            deleteContactButton.setEnabled(true);
+            copyToClipboardButton.setEnabled(true);
+        }
+        
+    }
+
+    private class AddressBookTableModel extends AbstractTableModel {
 
         @Override
         public int getRowCount() {
