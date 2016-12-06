@@ -68,6 +68,7 @@ public class AddressBookPanel extends JPanel {
         panel.add(newContactButton);
                 
         sendCashButton = new JButton("Send ZCash");
+        sendCashButton.addActionListener(new SendCashActionListener());
         sendCashButton.setEnabled(false);
         panel.add(sendCashButton);
         
@@ -181,7 +182,10 @@ public class AddressBookPanel extends JPanel {
                     "");
             if (name == null || "".equals(name))
                 return; // cancelled
-                
+
+            // TODO: check for dupes
+            names.add(name);
+            
             String address = (String) JOptionPane.showInputDialog(AddressBookPanel.this,
                     "Pleae enter the t-address or z-address of "+name,
                     "Add new contact step 2",
@@ -201,6 +205,14 @@ public class AddressBookPanel extends JPanel {
             });
         }
     }
+    
+    private class SendCashActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            // TODO: implement
+            JOptionPane.showMessageDialog(AddressBookPanel.this,
+                    "This is not implemented yet.  For now use \"Copy Address To Clipboard\"");
+        }
+    }
 
     private class AddressMouseListener extends MouseAdapter {
 
@@ -213,15 +225,21 @@ public class AddressBookPanel extends JPanel {
             int column = table.columnAtPoint(e.getPoint());
             table.changeSelection(row, column, false, false);
             AddressBookEntry entry = entries.get(row);
+            
             JPopupMenu menu = new JPopupMenu();
+            
             JMenuItem sendCash = new JMenuItem("Send ZCash to "+entry.name);
+            sendCash.addActionListener(new SendCashActionListener());
             menu.add(sendCash);
+            
             JMenuItem copyAddress = new JMenuItem("Copy address to clipboard");
             copyAddress.addActionListener(new CopyToClipboardActionListener());
             menu.add(copyAddress);
+            
             JMenuItem deleteEntry = new JMenuItem("Delete "+entry.name+" from contacts");
             deleteEntry.addActionListener(new DeleteAddressActionListener());
             menu.add(deleteEntry);
+            
             menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
             e.consume();
         }
