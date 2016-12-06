@@ -4,6 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -80,17 +86,41 @@ public class AddressBookPanel extends JPanel {
         return scrollPane;
     }
 
-    public AddressBookPanel() {
+    public AddressBookPanel() throws IOException {
         BoxLayout boxLayout = new BoxLayout(this,BoxLayout.Y_AXIS);
         setLayout(boxLayout);
         add(buildTablePanel());
         add(buildButtonsPanel());
-        
-        // add some entries for testing
-        AddressBookEntry entry1 = new AddressBookEntry("pesho","asdf");
-        AddressBookEntry entry2 = new AddressBookEntry("gosho","fdsa");
-        AddressBookEntry entry3 = new AddressBookEntry("tosho","qwer");
-        entries.add(entry1);entries.add(entry2);entries.add(entry3);
+       
+        loadEntriesFromDisk();
+    }
+    
+    private void loadEntriesFromDisk() throws IOException {
+        File addressBookFile = new File(OSUtil.getSettingsDirectory(),"addressBook.csv");
+        if (!addressBookFile.exists())
+            return;
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(addressBookFile))) {
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                // format is address,name - this way name can contain commas ;-)
+                int addressEnd = line.indexOf(',');
+                if (addressEnd < 0)
+                    throw new IOException("Address Book is corrupted!");
+                String address = line.substring(0, addressEnd);
+                String name = line.substring(addressEnd + 1);
+                if (!names.add(name))
+                    continue; // duplicate
+                entries.add(new AddressBookEntry(name,address));
+            }
+        }
+    }
+    
+    private void saveEntriesToDisk() throws IOException {
+        File addressBookFile = new File(OSUtil.getSettingsDirectory(),"addressBook.csv");
+        try (PrintWriter printWriter = new PrintWriter(new FileWriter(addressBookFile))) {
+            for (AddressBookEntry entry : entries) 
+                printWriter.println(entry.address+","+entry.name);
+        }
     }
 
     private class AddressMouseListener extends MouseAdapter {
