@@ -84,6 +84,7 @@ public class ZCashUI
     private DashboardPanel dashboard;
     private AddressesPanel addresses;
     private SendCashPanel  sendPanel;
+    private AddressBookPanel bookPanel;
 
     public ZCashUI(ZCashClientCaller clientCaller)
         throws IOException, InterruptedException, WalletCallException
@@ -113,6 +114,9 @@ public class ZCashUI
         tabs.addTab("Send cash ",
         		    new ImageIcon(cl.getResource("images/send.png")),
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter));
+        tabs.addTab("Address book ",
+                new ImageIcon(cl.getResource("images/address-book.png")),
+                bookPanel = new AddressBookPanel());
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
