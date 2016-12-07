@@ -122,7 +122,7 @@ public class DashboardPanel
 		
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 9));
 		JLabel logoLabel = new JLabel(new ImageIcon(
-			this.getClass().getClassLoader().getResource("images/Z-yellow.orange-logo-small.png")));
+			this.getClass().getClassLoader().getResource("images/ZCashSwingWalletUI-40x40.png")));
 		tempPanel.add(logoLabel);
 		//tempPanel.add(new JLabel(" "));
 		JLabel zcLabel = new JLabel("Cash Wallet        ");

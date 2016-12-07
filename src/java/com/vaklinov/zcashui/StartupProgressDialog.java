@@ -39,7 +39,7 @@ public class StartupProgressDialog extends JWindow {
     public StartupProgressDialog(ZCashClientCaller clientCaller) {
         this.clientCaller = clientCaller;
         
-        URL iconUrl = this.getClass().getClassLoader().getResource("images/Z-yellow.orange-logo.png");
+        URL iconUrl = this.getClass().getClassLoader().getResource("images/ZCashSwingWalletUI-246x246.png");
         imageIcon = new ImageIcon(iconUrl);
         imageLabel.setIcon(imageIcon);
         Container contentPane = getContentPane();

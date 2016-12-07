@@ -94,7 +94,7 @@ public class ZCashUI
         super("ZCash Swing Wallet UI 0.44 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
-        this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
+        this.setIconImage(new ImageIcon(cl.getResource("images/ZCashSwingWalletUI-246x246.png")).getImage());
 
         Container contentPane = this.getContentPane();
 
