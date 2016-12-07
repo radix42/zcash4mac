@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JWindow;
@@ -102,13 +103,19 @@ public class StartupProgressDialog extends JWindow {
     
     private void performOSXBundleLaunch() throws IOException, InterruptedException {
         
+        
         File bundlePath = new File(System.getProperty("zcash.location.dir"));
         bundlePath = bundlePath.getCanonicalFile();
+        
+        JOptionPane.showMessageDialog(null, "Running OSX Bundle-specific intialization\n" +
+                "bundlePath is "+bundlePath.getCanonicalPath());
         
         // run "first-run.sh"
         File firstRun = new File(bundlePath,"first-run.sh");
         Process firstRunProcess = Runtime.getRuntime().exec(firstRun.getCanonicalPath());
         firstRunProcess.waitFor();
+        
+        JOptionPane.showMessageDialog(null, "successfully executed first-run.sh");
         
         // then run fetch-params.sh
         File fetchParams = new File(bundlePath,"fetch-params.sh");
@@ -130,8 +137,10 @@ public class StartupProgressDialog extends JWindow {
             provingKey = provingKey.getCanonicalFile();
             if (provingKey.exists()) {
                 long length = provingKey.length();
-                if (length == PROVING_KEY_SIZE)
+                if (length == PROVING_KEY_SIZE) {
+                    JOptionPane.showMessageDialog(null,"Full proving key found!");
                     break;
+                }
                 final int percent = (int)(length * 100.0 / PROVING_KEY_SIZE);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -139,10 +148,11 @@ public class StartupProgressDialog extends JWindow {
                         progressBar.setValue(percent);
                     }
                 });
-            }
+            } else JOptionPane.showMessageDialog(null, "No proving key found, will try again in 250ms");
             Thread.sleep(POLL_PERIOD);
         }
         fetchParamsProcess.waitFor();
+        JOptionPane.showMessageDialog(null, "fetch-params process ended!");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 progressBar.setIndeterminate(true);
