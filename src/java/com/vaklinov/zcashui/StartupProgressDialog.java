@@ -118,7 +118,17 @@ public class StartupProgressDialog extends JWindow {
         String path = env.get("PATH");
         path = path + ":"+bundlePath.getCanonicalPath();
         env.put("PATH", path);
-        Process fetchParamsProcess = pb.start();
+        final Process fetchParamsProcess = pb.start();
+        
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                fetchParamsProcess.destroy();
+                File lockFile = new File("/tmp/fetch_params.lock");
+                lockFile.delete();
+                lockFile.deleteOnExit();
+            }
+        });
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 progressBar.setIndeterminate(false);
