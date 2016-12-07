@@ -24,6 +24,7 @@ public class StartupProgressDialog extends JWindow {
 
     private static final int POLL_PERIOD = 250;
     private static final int STARTUP_ERROR_CODE = -28;
+    private static final int PROVING_KEY_SIZE = 910173851;
     
     private BorderLayout borderLayout1 = new BorderLayout();
     private JLabel imageLabel = new JLabel();
@@ -119,9 +120,33 @@ public class StartupProgressDialog extends JWindow {
         Process fetchParamsProcess = pb.start();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                progressBar.setIndeterminate(false);
                 progressLabel.setText("Fetching parameters...");
             }
         });
+        while(true) {
+            File provingKey = new File(System.getProperty("user.home")+
+                    "/Library/Application Support/ZcashParam/sprout-proving.key");
+            provingKey = provingKey.getCanonicalFile();
+            if (provingKey.exists()) {
+                long length = provingKey.length();
+                if (length == PROVING_KEY_SIZE)
+                    break;
+                final int percent = (int)(length * 100.0 / PROVING_KEY_SIZE);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        progressLabel.setText("Fetching parameters "+percent+"%");
+                        progressBar.setValue(percent);
+                    }
+                });
+            }
+            Thread.sleep(POLL_PERIOD);
+        }
         fetchParamsProcess.waitFor();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressBar.setIndeterminate(true);
+            }
+        });
     }
 }
