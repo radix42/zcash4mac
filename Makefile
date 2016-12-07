@@ -41,7 +41,7 @@ zcash-bin: appbundle
 	dylibbundler -of -b -x $(APPBUNDLEEXE)/zcashd -d $(APPBUNDLE)/Contents/Frameworks/ -p @executable_path/../Frameworks/
 	dylibbundler -of -b -x $(APPBUNDLEEXE)/zcash-cli -d $(APPBUNDLE)/Contents/Frameworks/ -p @executable_path/../Frameworks/
 
-macapp: zcash-bin icons
+macapp: zcash-bin icons flock
 
 ################################################################################
 # Customizable variables for dmg generation
