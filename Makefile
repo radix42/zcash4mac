@@ -13,19 +13,19 @@ appbundle:
 	cp macosx/first-run.sh $(APPBUNDLEEXE)/
 
 icons: macosx/$(APPNAME)Icon.png appbundle
-	rm -rf macosx/$(APPNAME).iconset
-	mkdir -p macosx/$(APPNAME).iconset
-	sips -z 16 16     macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_16x16.png
-	sips -z 32 32     macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_16x16@2x.png
-	sips -z 32 32     macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_32x32.png
-	sips -z 64 64     macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_32x32@2x.png
-	sips -z 128 128   macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_128x128.png
-	sips -z 256 256   macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_128x128@2x.png
-	sips -z 256 256   macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_256x256.png
-	sips -z 512 512   macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_256x256@2x.png
-	sips -z 512 512   macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_512x512.png
-	cp macosx/$(APPNAME)Icon.png macosx/$(APPNAME).iconset/icon_512x512@2x.png
-	iconutil -c icns -o macosx/$(APPNAME).icns macosx/$(APPNAME).iconset
+#	rm -rf macosx/$(APPNAME).iconset
+#	mkdir -p macosx/$(APPNAME).iconset
+#	sips -z 16 16     macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_16x16.png
+#	sips -z 32 32     macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_16x16@2x.png
+#	sips -z 32 32     macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_32x32.png
+#	sips -z 64 64     macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_32x32@2x.png
+#	sips -z 128 128   macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_128x128.png
+#	sips -z 256 256   macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_128x128@2x.png
+#	sips -z 256 256   macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_256x256.png
+#	sips -z 512 512   macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_256x256@2x.png
+#	sips -z 512 512   macosx/Icon.png --out macosx/$(APPNAME).iconset/icon_512x512.png
+#	cp macosx/$(APPNAME)Icon.png macosx/$(APPNAME).iconset/icon_512x512@2x.png
+#	iconutil -c icns -o macosx/$(APPNAME).icns macosx/$(APPNAME).iconset
 	cp macosx/$(APPNAME).icns $(APPBUNDLEICON)/
 	sed -i.bak 's/GenericApp.icns/ZCashSwingWalletUI.icns/' $(APPBUNDLECONTENTS)/Info.plist
 	rm $(APPBUNDLECONTENTS)/Info.plist.bak
