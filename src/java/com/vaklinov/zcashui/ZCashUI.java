@@ -38,8 +38,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
 import javax.swing.ImageIcon;
@@ -381,10 +383,15 @@ public class ZCashUI
         } catch (Exception e)
         {
             e.printStackTrace();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(baos);
+            e.printStackTrace(ps);
+            ps.flush();
+            String stackTrace = new String(baos.toByteArray());
             JOptionPane.showMessageDialog(
                 null,
                 "A general unexpected critical error has occurred: \n" + e.getMessage() + "\n" +
-                "See the console output for more detailed error information!",
+                stackTrace,
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             System.exit(3);
