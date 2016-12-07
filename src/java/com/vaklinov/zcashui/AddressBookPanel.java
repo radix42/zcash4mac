@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -57,6 +58,9 @@ public class AddressBookPanel extends JPanel {
     private JTable table;
     
     private JButton sendCashButton, deleteContactButton,copyToClipboardButton;
+    
+    private final SendCashPanel sendCashPanel;
+    private final JTabbedPane tabs;
     
     private JPanel buildButtonsPanel() {
         JPanel panel = new JPanel();
@@ -98,7 +102,9 @@ public class AddressBookPanel extends JPanel {
         return scrollPane;
     }
 
-    public AddressBookPanel() throws IOException {
+    public AddressBookPanel(SendCashPanel sendCashPanel, JTabbedPane tabs) throws IOException {
+        this.sendCashPanel = sendCashPanel;
+        this.tabs = tabs;
         BoxLayout boxLayout = new BoxLayout(this,BoxLayout.Y_AXIS);
         setLayout(boxLayout);
         add(buildTablePanel());
@@ -208,9 +214,12 @@ public class AddressBookPanel extends JPanel {
     
     private class SendCashActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            // TODO: implement
-            JOptionPane.showMessageDialog(AddressBookPanel.this,
-                    "This is not implemented yet.  For now use \"Copy Address To Clipboard\"");
+            int row = table.getSelectedRow();
+            if (row < 0)
+                return;
+            AddressBookEntry entry = entries.get(row);
+            sendCashPanel.prepareForSending(entry.address);
+            tabs.setSelectedIndex(2);
         }
     }
 

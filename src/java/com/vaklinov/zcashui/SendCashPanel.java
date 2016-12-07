@@ -540,7 +540,11 @@ public class SendCashPanel
 		operationStatusTimer.start();
 	}
 
-		
+	
+	public void prepareForSending(String address) {
+	    destinationAddressField.setText(address);
+	}
+	
 	private void updateWalletAddressPositiveBalanceComboBox()
 		throws WalletCallException, IOException, InterruptedException
 	{

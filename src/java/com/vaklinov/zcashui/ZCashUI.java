@@ -116,7 +116,7 @@ public class ZCashUI
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter));
         tabs.addTab("Address book ",
                 new ImageIcon(cl.getResource("images/address-book.png")),
-                bookPanel = new AddressBookPanel());
+                bookPanel = new AddressBookPanel(sendPanel,tabs));
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
