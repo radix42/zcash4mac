@@ -132,15 +132,22 @@ public class StartupProgressDialog extends JWindow {
             }
         });
         while(true) {
+            
             File provingKey = new File(System.getProperty("user.home")+
-                    "/Library/Application Support/ZcashParam/sprout-proving.key");
+                    "/Library/Application Support/ZcashParams/sprout-proving.key");
             provingKey = provingKey.getCanonicalFile();
-            if (provingKey.exists()) {
-                long length = provingKey.length();
-                if (length == PROVING_KEY_SIZE) {
-                    JOptionPane.showMessageDialog(null,"Full proving key found!");
-                    break;
-                }
+            
+            File provingKeyDL = new File(System.getProperty("user.home")+
+                    "/Library/Application Support/ZcashParams/sprout-proving.key.dl");
+            provingKeyDL = provingKeyDL.getCanonicalFile();
+            
+            if (provingKey.exists() && provingKey.length() == PROVING_KEY_SIZE) {
+                JOptionPane.showMessageDialog(null,"Full proving key found!");
+                break;
+            }
+            
+            if (provingKeyDL.exists()) {
+                long length = provingKeyDL.length();
                 final int percent = (int)(length * 100.0 / PROVING_KEY_SIZE);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -148,7 +155,7 @@ public class StartupProgressDialog extends JWindow {
                         progressBar.setValue(percent);
                     }
                 });
-            } else JOptionPane.showMessageDialog(null, "No proving key found, will try again in 250ms");
+            } else JOptionPane.showMessageDialog(null, "No keys found, sleeping ");
             Thread.sleep(POLL_PERIOD);
         }
         fetchParamsProcess.waitFor();
