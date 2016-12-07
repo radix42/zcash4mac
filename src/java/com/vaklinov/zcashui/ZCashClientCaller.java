@@ -121,10 +121,16 @@ public class ZCashClientCaller
 		    throw new IOException("zcash-cli exists but zcashd doesn't?  Check your installation!");
 	}
 
-	public synchronized void startDaemon() throws IOException,InterruptedException {
+	public synchronized Process startDaemon() throws IOException,InterruptedException {
 	    CommandExecutor starter = new CommandExecutor(
-	            new String[] { zcashd.getCanonicalPath(),"--daemon"});
-	    starter.executeNoResult();
+	            new String[] { zcashd.getCanonicalPath()});
+	    return starter.executeNoResult();
+	}
+	
+	public synchronized void stopDaemon() throws IOException,InterruptedException {
+	    CommandExecutor stopper = new CommandExecutor(
+	            new String[] {zcashcli.getCanonicalPath(),"--stop"});
+	    stopper.executeNoResult();
 	}
 	
 	public synchronized JsonObject getInfo() throws IOException,InterruptedException,WalletCallException {

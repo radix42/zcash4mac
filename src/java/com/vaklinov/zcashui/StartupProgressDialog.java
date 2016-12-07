@@ -54,7 +54,7 @@ public class StartupProgressDialog extends JWindow {
     public void waitForStartup() throws IOException,
         InterruptedException,WalletCallException,InvocationTargetException {
         System.out.println("trying to start zcashd");
-        clientCaller.startDaemon();
+        final Process daemonProcess = clientCaller.startDaemon();
         while(true) {
             Thread.sleep(POLL_PERIOD);
             JsonObject info = clientCaller.getInfo();
@@ -72,6 +72,20 @@ public class StartupProgressDialog extends JWindow {
         SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 dispose();
+            }
+        });
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                if (daemonProcess.isAlive()) {
+                    System.out.println("Stopping zcashd because we started it");
+                    try {
+                        clientCaller.stopDaemon();
+                    } catch (Exception bad) {
+                        System.out.println("Couldn't stop zcashd!");
+                        bad.printStackTrace();
+                    }
+                } else
+                    System.out.println("not stopping zcashd");
             }
         });
     }

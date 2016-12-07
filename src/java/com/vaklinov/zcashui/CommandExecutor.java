@@ -50,8 +50,8 @@ public class CommandExecutor
 		this.args = args;
 	}		
 	
-	public void executeNoResult() throws IOException {
-	    Runtime.getRuntime().exec(args);
+	public Process executeNoResult() throws IOException {
+	    return Runtime.getRuntime().exec(args);
 	}
 	
 	public String execute()
