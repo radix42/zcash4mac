@@ -2,9 +2,11 @@ package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -15,12 +17,14 @@ import javax.swing.SwingUtilities;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 
 public class StartupProgressDialog extends JWindow {
 
     private static final int POLL_PERIOD = 250;
     private static final int STARTUP_ERROR_CODE = -28;
+    private static final int PROVING_KEY_SIZE = 910173851;
     
     private BorderLayout borderLayout1 = new BorderLayout();
     private JLabel imageLabel = new JLabel();
@@ -53,6 +57,12 @@ public class StartupProgressDialog extends JWindow {
     
     public void waitForStartup() throws IOException,
         InterruptedException,WalletCallException,InvocationTargetException {
+        
+        // special handling of OSX app bundle
+        if (OSUtil.getOSType() == OS_TYPE.MAC_OS && 
+                "true".equalsIgnoreCase(System.getProperty("launching.from.appbundle")))
+            performOSXBundleLaunch();
+        
         System.out.println("trying to start zcashd");
         final Process daemonProcess = clientCaller.startDaemon();
         while(true) {
@@ -86,6 +96,56 @@ public class StartupProgressDialog extends JWindow {
                     }
                 } else
                     System.out.println("not stopping zcashd");
+            }
+        });
+    }
+    
+    private void performOSXBundleLaunch() throws IOException, InterruptedException {
+        
+        File bundlePath = new File(System.getProperty("zcash.location.dir"));
+        bundlePath = bundlePath.getCanonicalFile();
+        
+        // run "first-run.sh"
+        File firstRun = new File(bundlePath,"first-run.sh");
+        Process firstRunProcess = Runtime.getRuntime().exec(firstRun.getCanonicalPath());
+        firstRunProcess.waitFor();
+        
+        // then run fetch-params.sh
+        File fetchParams = new File(bundlePath,"fetch-params.sh");
+        ProcessBuilder pb = new ProcessBuilder(fetchParams.getCanonicalPath());
+        Map<String, String> env = pb.environment();
+        String path = env.get("PATH");
+        path = path + ":"+bundlePath.getCanonicalPath();
+        env.put("PATH", path);
+        Process fetchParamsProcess = pb.start();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressBar.setIndeterminate(false);
+                progressLabel.setText("Fetching parameters...");
+            }
+        });
+        while(true) {
+            File provingKey = new File(System.getProperty("user.home")+
+                    "/Library/Application Support/ZcashParam/sprout-proving.key");
+            provingKey = provingKey.getCanonicalFile();
+            if (provingKey.exists()) {
+                long length = provingKey.length();
+                if (length == PROVING_KEY_SIZE)
+                    break;
+                final int percent = (int)(length * 100.0 / PROVING_KEY_SIZE);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        progressLabel.setText("Fetching parameters "+percent+"%");
+                        progressBar.setValue(percent);
+                    }
+                });
+            }
+            Thread.sleep(POLL_PERIOD);
+        }
+        fetchParamsProcess.waitFor();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressBar.setIndeterminate(true);
             }
         });
     }
