@@ -10,7 +10,6 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JWindow;
@@ -107,15 +106,10 @@ public class StartupProgressDialog extends JWindow {
         File bundlePath = new File(System.getProperty("zcash.location.dir"));
         bundlePath = bundlePath.getCanonicalFile();
         
-        JOptionPane.showMessageDialog(null, "Running OSX Bundle-specific intialization\n" +
-                "bundlePath is "+bundlePath.getCanonicalPath());
-        
         // run "first-run.sh"
         File firstRun = new File(bundlePath,"first-run.sh");
         Process firstRunProcess = Runtime.getRuntime().exec(firstRun.getCanonicalPath());
         firstRunProcess.waitFor();
-        
-        JOptionPane.showMessageDialog(null, "successfully executed first-run.sh");
         
         // then run fetch-params.sh
         File fetchParams = new File(bundlePath,"fetch-params.sh");
@@ -141,10 +135,8 @@ public class StartupProgressDialog extends JWindow {
                     "/Library/Application Support/ZcashParams/sprout-proving.key.dl");
             provingKeyDL = provingKeyDL.getCanonicalFile();
             
-            if (provingKey.exists() && provingKey.length() == PROVING_KEY_SIZE) {
-                JOptionPane.showMessageDialog(null,"Full proving key found!");
+            if (provingKey.exists() && provingKey.length() == PROVING_KEY_SIZE) 
                 break;
-            }
             
             if (provingKeyDL.exists()) {
                 long length = provingKeyDL.length();
@@ -155,11 +147,10 @@ public class StartupProgressDialog extends JWindow {
                         progressBar.setValue(percent);
                     }
                 });
-            } else JOptionPane.showMessageDialog(null, "No keys found, sleeping ");
+            } 
             Thread.sleep(POLL_PERIOD);
         }
         fetchParamsProcess.waitFor();
-        JOptionPane.showMessageDialog(null, "fetch-params process ended!");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 progressBar.setIndeterminate(true);
