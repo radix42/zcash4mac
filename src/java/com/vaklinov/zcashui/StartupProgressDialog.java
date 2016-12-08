@@ -24,7 +24,6 @@ public class StartupProgressDialog extends JWindow {
 
     private static final int POLL_PERIOD = 250;
     private static final int STARTUP_ERROR_CODE = -28;
-    private static final int PROVING_KEY_SIZE = 910173851;
     
     private BorderLayout borderLayout1 = new BorderLayout();
     private JLabel imageLabel = new JLabel();
@@ -59,9 +58,12 @@ public class StartupProgressDialog extends JWindow {
         InterruptedException,WalletCallException,InvocationTargetException {
         
         // special handling of OSX app bundle
-        if (OSUtil.getOSType() == OS_TYPE.MAC_OS && 
-                "true".equalsIgnoreCase(System.getProperty("launching.from.appbundle")))
-            performOSXBundleLaunch();
+        if (OSUtil.getOSType() == OS_TYPE.MAC_OS) {
+            ProvingKeyFetcher keyFetcher = new ProvingKeyFetcher();
+            keyFetcher.fetchIfMissing(this);
+            if ("true".equalsIgnoreCase(System.getProperty("launching.from.appbundle")))
+                performOSXBundleLaunch();
+        }
         
         System.out.println("trying to start zcashd");
         final Process daemonProcess = clientCaller.startDaemon();
@@ -101,8 +103,6 @@ public class StartupProgressDialog extends JWindow {
     }
     
     private void performOSXBundleLaunch() throws IOException, InterruptedException {
-        
-        
         File bundlePath = new File(System.getProperty("zcash.location.dir"));
         bundlePath = bundlePath.getCanonicalFile();
         
@@ -110,61 +110,5 @@ public class StartupProgressDialog extends JWindow {
         File firstRun = new File(bundlePath,"first-run.sh");
         Process firstRunProcess = Runtime.getRuntime().exec(firstRun.getCanonicalPath());
         firstRunProcess.waitFor();
-        
-        // then run fetch-params.sh
-        File fetchParams = new File(bundlePath,"fetch-params.sh");
-        ProcessBuilder pb = new ProcessBuilder(fetchParams.getCanonicalPath());
-        Map<String, String> env = pb.environment();
-        String path = env.get("PATH");
-        path = path + ":"+bundlePath.getCanonicalPath();
-        env.put("PATH", path);
-        final Process fetchParamsProcess = pb.start();
-        
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                fetchParamsProcess.destroy();
-                File lockFile = new File("/tmp/fetch_params.lock");
-                lockFile.delete();
-                lockFile.deleteOnExit();
-            }
-        });
-        
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                progressBar.setIndeterminate(false);
-                progressLabel.setText("Fetching parameters...");
-            }
-        });
-        while(true) {
-            
-            File provingKey = new File(System.getProperty("user.home")+
-                    "/Library/Application Support/ZcashParams/sprout-proving.key");
-            provingKey = provingKey.getCanonicalFile();
-            
-            File provingKeyDL = new File(System.getProperty("user.home")+
-                    "/Library/Application Support/ZcashParams/sprout-proving.key.dl");
-            provingKeyDL = provingKeyDL.getCanonicalFile();
-            
-            if (provingKey.exists() && provingKey.length() == PROVING_KEY_SIZE) 
-                break;
-            
-            if (provingKeyDL.exists()) {
-                long length = provingKeyDL.length();
-                final int percent = (int)(length * 100.0 / PROVING_KEY_SIZE);
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        progressLabel.setText("Fetching parameters "+percent+"%");
-                        progressBar.setValue(percent);
-                    }
-                });
-            } 
-            Thread.sleep(POLL_PERIOD);
-        }
-        fetchParamsProcess.waitFor();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                progressBar.setIndeterminate(true);
-            }
-        });
     }
 }
