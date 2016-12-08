@@ -31,17 +31,13 @@ icons: macosx/$(APPNAME)Icon.png appbundle
 	rm $(APPBUNDLECONTENTS)/Info.plist.bak
 	rm $(APPBUNDLERESOURCES)/GenericApp.icns
 
-flock: appbundle
-	cp -f macosx/flock $(APPBUNDLEEXE)/flock
-
 zcash-bin: appbundle
 	cp macosx/zcash/src/zcashd $(APPBUNDLEEXE)/zcashd
 	cp macosx/zcash/src/zcash-cli $(APPBUNDLEEXE)/zcash-cli
-	cp macosx/zcash/zcutil/fetch-params.sh $(APPBUNDLEEXE)/
 	dylibbundler -of -b -x $(APPBUNDLEEXE)/zcashd -d $(APPBUNDLE)/Contents/Frameworks/ -p @executable_path/../Frameworks/
 	dylibbundler -of -b -x $(APPBUNDLEEXE)/zcash-cli -d $(APPBUNDLE)/Contents/Frameworks/ -p @executable_path/../Frameworks/
 
-macapp: zcash-bin icons flock
+macapp: zcash-bin icons
 
 ################################################################################
 # Customizable variables for dmg generation
@@ -54,7 +50,7 @@ SOURCE_DIR ?= build/osxapp
 SOURCE_FILES ?= $(NAME).app
 
 TEMPLATE_DMG ?= template.dmg
-TEMPLATE_SIZE ?= 200m
+TEMPLATE_SIZE ?= 250m
 
 ################################################################################
 # DMG building. No editing should be needed beyond this point.
