@@ -41,6 +41,9 @@
     <property name="main-class"  value="com.vaklinov.zcashui.ZCashUI"/>
 
 	<path id="main-classpath">
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+		</fileset>
 	</path>
 	
     <target name="clean">
@@ -51,6 +54,7 @@
     	<copy todir="${classes.dir}" >  
     	    <fileset dir="${src.dir}/resources">  
     	        <include name="images/**"/>
+    	    	    <include name="sprout-verifying.key"/>
     	    </fileset>
     	</copy>
     </target>
@@ -132,7 +136,12 @@
 		  identifier="zcash.wallet.ui"
 		  mainclassname="${main-class}" >
 			<runtime dir="${env.JAVA_HOME}"/>
-			<classpath file="${jar.dir}/${ant.project.name}.jar" />
+			<classpath dir="lib"> 
+					<include name="**/*.jar" />
+			</classpath>
+			<classpath dir="build">
+				<include name="**/*.jar" />
+				</classpath>
 			<option value="-Dzcash.location.dir=$APP_ROOT/Contents/MacOS" />
 			<option value="-Dlaunching.from.appbundle=true" />
 	     </bundleapp>
