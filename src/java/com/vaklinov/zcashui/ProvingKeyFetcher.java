@@ -32,7 +32,7 @@ public class ProvingKeyFetcher {
     private static final String URL = "https://zcash.dl.mercerweiss.com/sprout-proving.key";
     // TODO: add backups
     
-    public void fetchIfMissing(Component parent) throws IOException {
+    public void fetchIfMissing(Component parent) throws IOException,InterruptedException {
         File zCashParams = new File(System.getProperty("user.home") + "/Library/Application Support/ZcashParams");
         zCashParams = zCashParams.getCanonicalFile();
         
@@ -56,14 +56,11 @@ public class ProvingKeyFetcher {
         else if (provingKeyFile.length() != PROVING_KEY_SIZE)
             needsFetch = true;
         else {
-            // TODO: check sha256
-            System.out.println("should check sha1 here");
+            needsFetch = !checkSHA256(provingKeyFile);
         }
         
-        if (!needsFetch) {
-            System.out.println("no need to fetch");
+        if (!needsFetch) 
             return;
-        }
         
         JOptionPane.showMessageDialog(parent, "Zcash needs to download a large file.  This will happen only once.\n  "
                 + "Please be patient.  Press OK to continue");
@@ -88,6 +85,10 @@ public class ProvingKeyFetcher {
             try {if (response != null)response.close();} catch (IOException ignore){}
             try {httpClient.close();} catch (IOException ignore){}
         }
+        if (!checkSHA256(provingKeyFile)) {
+            JOptionPane.showMessageDialog(parent, "Failed to download proving key.  Cannot continue");
+            System.exit(-4);
+        }
     }
             
 
@@ -98,5 +99,12 @@ public class ProvingKeyFetcher {
             os.write(buf,0,read);
         }
         os.flush();
+    }
+    
+    private static boolean checkSHA256(File provingKey) throws IOException, InterruptedException {
+        CommandExecutor executor = new CommandExecutor(new String[]
+                {"shasum","-a","256",provingKey.getCanonicalPath()});
+        String sum = executor.execute();
+        return sum.startsWith(SHA256);
     }
 }
