@@ -41,6 +41,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -63,6 +65,9 @@ import javax.swing.border.EtchedBorder;
 public class TransactionTable 
 	extends DataTable 
 {	
+    
+    private static final Logger LOG = Logger.getLogger(TransactionTable.class.getName());
+    
 	public TransactionTable(final Object[][] rowData, final Object[] columnNames, 
 			                final JFrame parent, final ZCashClientCaller caller)
 	{
@@ -85,7 +90,7 @@ public class TransactionTable
 						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 6).toString();
 						txID = txID.replaceAll("\"", ""); // In case it has quotes
 						
-						System.out.println("Transaction ID for detail dialog is: " + txID);
+						LOG.fine("Transaction ID for detail dialog is: " + txID);
 						Map<String, String> details = caller.getRawTransactionDetails(txID);
 						String rawTrans = caller.getRawTransaction(txID);
 						
@@ -93,7 +98,7 @@ public class TransactionTable
 						dd.setVisible(true);
 					} catch (Exception ex)
 					{
-						ex.printStackTrace();
+						LOG.log(Level.WARNING, "", ex);
 						// TODO: report exception to user
 					}
 				} else
@@ -120,13 +125,13 @@ public class TransactionTable
 						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 6).toString();
 						txID = txID.replaceAll("\"", ""); // In case it has quotes
 						
-						System.out.println("Transaction ID for block explorer is: " + txID);
+						LOG.fine("Transaction ID for block explorer is: " + txID);
 						// https://explorer.zcha.in/transactions/<ID>
 						Desktop.getDesktop().browse(
 							new URL("https://explorer.zcha.in/transactions/" + txID).toURI());
 					} catch (Exception ex)
 					{
-						ex.printStackTrace();
+						LOG.log(Level.WARNING, "", ex);
 						// TODO: report exception to user
 					}
 				} else

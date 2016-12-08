@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
@@ -57,6 +59,8 @@ import com.eclipsesource.json.WriterConfig;
  */
 public class ZCashClientCaller
 {
+    private static final Logger LOG = Logger.getLogger(ZCashClientCaller.class.getName());
+    
 	public static class WalletBalance
 	{
 		public double transparentBalance;
@@ -142,7 +146,7 @@ public class ZCashClientCaller
 	    try {
 	        return Json.parse(info).asObject();
 	    } catch (ParseException pe){
-	        pe.printStackTrace();
+	        LOG.log(Level.WARNING, "getInfo failed", pe);
 	        throw new IOException(pe);
 	    }
 	}
@@ -407,7 +411,7 @@ public class ZCashClientCaller
 		  	throw new WalletCallException("Error response from wallet: " + strResponse);
 		}
 
-		System.out.println("Sending cash with the following command: " +
+		LOG.info("Sending cash with the following command: " +
                 sendCashParameters[0] + " " + sendCashParameters[1] + " " +
                 sendCashParameters[2] + " " + sendCashParameters[3] + "." +
                 " Got result: [" + strResponse + "]");
@@ -424,7 +428,7 @@ public class ZCashClientCaller
 
 		String status = jsonStatus.getString("status", "ERROR");
 
-		System.out.println("Operation " + opID + " status is " + response + ".");
+		LOG.info("Operation " + opID + " status is " + response + ".");
 
 		if (status.equalsIgnoreCase("success") ||
 			status.equalsIgnoreCase("error") ||
@@ -449,7 +453,7 @@ public class ZCashClientCaller
 
 		String status = jsonStatus.getString("status", "ERROR");
 
-		System.out.println("Operation " + opID + " status is " + response + ".");
+		LOG.info("Operation " + opID + " status is " + response + ".");
 
 		if (status.equalsIgnoreCase("success"))
 		{
@@ -582,7 +586,7 @@ public class ZCashClientCaller
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String response = this.executeCommandAndGetSingleStringResponse("encryptwallet", password);
-		System.out.println("Result of wallet encryption is: \n" + response);
+		LOG.info("Result of wallet encryption is: \n" + response);
 		// If no exception - obviously successful
 	}
 	
@@ -590,7 +594,7 @@ public class ZCashClientCaller
 	public void backupWallet(String fileName)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		System.out.println("Backup up wallet to location: " + fileName);
+		LOG.info("Backup up wallet to location: " + fileName);
 		String response = this.executeCommandAndGetSingleStringResponse("backupwallet", fileName);
 		// If no exception - obviously successful		
 	}
@@ -599,7 +603,7 @@ public class ZCashClientCaller
 	public void exportWallet(String fileName)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		System.out.println("Export wallet keys to location: " + fileName);
+		LOG.info("Export wallet keys to location: " + fileName);
 		String response = this.executeCommandAndGetSingleStringResponse("z_exportwallet", fileName);
 		// If no exception - obviously successful		
 	}
@@ -608,7 +612,7 @@ public class ZCashClientCaller
 	public void importWallet(String fileName)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		System.out.println("Import wallet keys from location: " + fileName);
+		LOG.info("Import wallet keys from location: " + fileName);
 		String response = this.executeCommandAndGetSingleStringResponse("z_importwallet", fileName);
 		// If no exception - obviously successful		
 	}

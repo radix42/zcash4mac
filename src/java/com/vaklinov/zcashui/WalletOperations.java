@@ -34,6 +34,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -51,6 +53,9 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
  */
 public class WalletOperations
 {	
+    
+    private static final Logger LOG = Logger.getLogger(WalletOperations.class.getName());
+    
 	private ZCashUI parent;
 	private JTabbedPane tabs;
 	private DashboardPanel dashboard;
@@ -124,7 +129,7 @@ public class WalletOperations
 			} catch (WalletCallException wce)
 			{
 				this.parent.setCursor(oldCursor);
-				wce.printStackTrace();
+				LOG.log(Level.WARNING, "", wce);
 				
 				JOptionPane.showMessageDialog(
 					this.parent, 
@@ -181,7 +186,7 @@ public class WalletOperations
 			} catch (WalletCallException wce)
 			{
 				this.parent.setCursor(oldCursor);
-				wce.printStackTrace();
+				LOG.log(Level.WARNING, "", wce);
 				
 				JOptionPane.showMessageDialog(
 					this.parent, 
@@ -234,7 +239,7 @@ public class WalletOperations
 			} catch (WalletCallException wce)
 			{
 				this.parent.setCursor(oldCursor);
-				wce.printStackTrace();
+				LOG.log(Level.WARNING, "", wce);
 				
 				JOptionPane.showMessageDialog(
 					this.parent, 
@@ -303,7 +308,7 @@ public class WalletOperations
 			} catch (WalletCallException wce)
 			{
 				this.parent.setCursor(oldCursor);
-				wce.printStackTrace();
+				LOG.log(Level.WARNING, "", wce);
 				
 				JOptionPane.showMessageDialog(
 					this.parent, 

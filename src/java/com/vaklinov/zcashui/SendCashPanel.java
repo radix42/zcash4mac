@@ -47,6 +47,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -75,6 +77,9 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 public class SendCashPanel
 	extends JPanel
 {
+    
+    private static final Logger LOG = Logger.getLogger(SendCashPanel.class.getName());
+    
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
 	
@@ -236,7 +241,7 @@ public class SendCashPanel
 					SendCashPanel.this.sendCash();
 				} catch (Exception ex)
 				{
-					ex.printStackTrace();
+					LOG.log(Level.WARNING, "", ex);
 					
 					String errMessage = "";
 					if (ex instanceof WalletCallException)
@@ -265,7 +270,7 @@ public class SendCashPanel
 					long start = System.currentTimeMillis();
 					String[][] data = SendCashPanel.this.getAddressPositiveBalanceDataFromWallet();
 					long end = System.currentTimeMillis();
-					System.out.println("Gathering of address/balance table data done in " + (end - start) + "ms." );
+					LOG.fine("Gathering of address/balance table data done in " + (end - start) + "ms." );
 					
 					return data;
 				}
@@ -284,7 +289,7 @@ public class SendCashPanel
 					SendCashPanel.this.updateWalletAddressPositiveBalanceComboBox();
 				} catch (Exception ex)
 				{
-					ex.printStackTrace();
+					LOG.log(Level.WARNING, "", ex);
 					SendCashPanel.this.errorReporter.reportError(ex);
 				}
 			}
@@ -313,7 +318,7 @@ public class SendCashPanel
 					}
 				} catch (Exception ex)
 				{
-					ex.printStackTrace();
+					LOG.log(Level.WARNING, "", ex);
 					// TODO: clipboard exception handling - do it better
 					// java.awt.datatransfer.UnsupportedFlavorException: Unicode String
 					//SendCashPanel.this.errorReporter.reportError(ex);
@@ -531,7 +536,7 @@ public class SendCashPanel
 					SendCashPanel.this.repaint();
 				} catch (Exception ex)
 				{
-					ex.printStackTrace();
+					LOG.log(Level.WARNING, "", ex);
 					SendCashPanel.this.errorReporter.reportError(ex);
 				}
 			}
