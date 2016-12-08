@@ -1,20 +1,23 @@
 package com.vaklinov.zcashui;
 
 import java.awt.Component;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 import javax.swing.ProgressMonitorInputStream;
+import javax.xml.bind.DatatypeConverter;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -32,7 +35,7 @@ public class ProvingKeyFetcher {
     private static final String URL = "https://zcash.dl.mercerweiss.com/sprout-proving.key";
     // TODO: add backups
     
-    public void fetchIfMissing(Component parent) throws IOException,InterruptedException {
+    public void fetchIfMissing(Component parent) throws IOException {
         File zCashParams = new File(System.getProperty("user.home") + "/Library/Application Support/ZcashParams");
         zCashParams = zCashParams.getCanonicalFile();
         
@@ -101,10 +104,19 @@ public class ProvingKeyFetcher {
         os.flush();
     }
     
-    private static boolean checkSHA256(File provingKey) throws IOException, InterruptedException {
-        CommandExecutor executor = new CommandExecutor(new String[]
-                {"shasum","-a","256",provingKey.getCanonicalPath()});
-        String sum = executor.execute();
-        return sum.startsWith(SHA256);
+    private static boolean checkSHA256(File provingKey) throws IOException {
+        MessageDigest sha256;
+        try {
+            sha256 = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException impossible) {
+            throw new RuntimeException(impossible);
+        }
+        try (InputStream is = new BufferedInputStream(new FileInputStream(provingKey))) {
+            DigestInputStream dis = new DigestInputStream(is, sha256);
+            byte [] temp = new byte[0x1 << 13];
+            while(dis.read(temp) >= 0);
+            byte [] digest = sha256.digest();
+            return SHA256.equalsIgnoreCase(DatatypeConverter.printHexBinary(digest));
+        }
     }
 }
