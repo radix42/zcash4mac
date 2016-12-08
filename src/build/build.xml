@@ -136,12 +136,11 @@
 		  identifier="zcash.wallet.ui"
 		  mainclassname="${main-class}" >
 			<runtime dir="${env.JAVA_HOME}"/>
-			<classpath dir="lib"> 
-					<include name="**/*.jar" />
-			</classpath>
-			<classpath dir="build">
-				<include name="**/*.jar" />
-				</classpath>
+			<classpath file="lib/commons-commons-codec-1.9.jar" />
+			<classpath file="lib/commons-logging-1.2.jar" />
+			<classpath file="lib/httpclient-4.5.2.jar" />
+			<classpath file="lib/httpcore-4.4.4.jar" />
+			<classpath file="${jar.dir}/${ant.project.name}.jar" />
 			<option value="-Dzcash.location.dir=$APP_ROOT/Contents/MacOS" />
 			<option value="-Dlaunching.from.appbundle=true" />
 	     </bundleapp>
