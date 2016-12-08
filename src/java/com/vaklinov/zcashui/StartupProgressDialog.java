@@ -67,6 +67,7 @@ public class StartupProgressDialog extends JWindow {
         
         System.out.println("trying to start zcashd");
         final Process daemonProcess = clientCaller.startDaemon();
+        Thread.sleep(POLL_PERIOD); // just a little extra
         while(true) {
             Thread.sleep(POLL_PERIOD);
             JsonObject info = clientCaller.getInfo();
