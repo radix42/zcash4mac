@@ -143,6 +143,7 @@
 			<classpath file="${jar.dir}/${ant.project.name}.jar" />
 			<option value="-Dzcash.location.dir=$APP_ROOT/Contents/MacOS" />
 			<option value="-Dlaunching.from.appbundle=true" />
+			<option value="-Djava.util.logging.config.file=$APP_ROOT/Contents/MacOS/logging.properties" />
 	     </bundleapp>
 	</target>
 		
