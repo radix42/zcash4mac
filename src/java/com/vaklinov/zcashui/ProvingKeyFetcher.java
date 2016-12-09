@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitorInputStream;
@@ -29,6 +30,8 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class ProvingKeyFetcher {
     
+    private static final Logger LOG = Logger.getLogger(ProvingKeyFetcher.class.getName());
+    
     
     private static final int PROVING_KEY_SIZE = 910173851;
     private static final String SHA256 = "8bc20a7f013b2b58970cddd2e7ea028975c88ae7ceb9259a5344a16bc2c0eef7";
@@ -41,6 +44,9 @@ public class ProvingKeyFetcher {
         
         boolean needsFetch = false;
         if (!zCashParams.exists()) {
+            
+            LOG.info(zCashParams.getCanonicalPath()+" did not exist");
+            
             needsFetch = true;
             zCashParams.mkdirs();
         }
@@ -54,16 +60,22 @@ public class ProvingKeyFetcher {
         
         File provingKeyFile = new File(zCashParams,"sprout-proving.key");
         provingKeyFile = provingKeyFile.getCanonicalFile();
-        if (!provingKeyFile.exists())
+        if (!provingKeyFile.exists()) {
+            LOG.info("proving key file does not exist");
             needsFetch = true;
-        else if (provingKeyFile.length() != PROVING_KEY_SIZE)
+        } else if (provingKeyFile.length() != PROVING_KEY_SIZE) {
+            LOG.info("proving key file is wrong size "+provingKeyFile.length());
             needsFetch = true;
-        else {
+        } else {
             needsFetch = !checkSHA256(provingKeyFile);
+            if (needsFetch)
+                LOG.info("proving key SHA 256 did not match");
         }
         
-        if (!needsFetch) 
+        if (!needsFetch) {
+            LOG.info("no need to fetch proving key file");
             return;
+        }
         
         JOptionPane.showMessageDialog(parent, "Zcash needs to download a large file.  This will happen only once.\n  "
                 + "Please be patient.  Press OK to continue");
@@ -79,8 +91,11 @@ public class ProvingKeyFetcher {
             ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(parent, "Downloading proving key", is);
             pmis.getProgressMonitor().setMaximum(PROVING_KEY_SIZE);
             pmis.getProgressMonitor().setMillisToPopup(10);
+            
+            LOG.info("starting fetch of proving key file");
             copy(pmis,os);
             os.close();
+            LOG.info("finished fetch of proving key file");
         } catch (InterruptedIOException cancelled) {
             JOptionPane.showMessageDialog(null, "Zcash cannot proceed without a proving key.");
             System.exit(-3);
@@ -89,6 +104,7 @@ public class ProvingKeyFetcher {
             try {httpClient.close();} catch (IOException ignore){}
         }
         if (!checkSHA256(provingKeyFile)) {
+            LOG.info("fetched proving key file failed checksum");
             JOptionPane.showMessageDialog(parent, "Failed to download proving key.  Cannot continue");
             System.exit(-4);
         }

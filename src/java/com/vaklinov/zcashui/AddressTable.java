@@ -34,6 +34,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -49,6 +51,9 @@ import javax.swing.KeyStroke;
 public class AddressTable 
 	extends DataTable 
 {	
+    
+    private static final Logger LOG = Logger.getLogger(AddressTable.class.getName());
+    
 	public AddressTable(final Object[][] rowData, final Object[] columnNames, 
 			            final ZCashClientCaller caller)
 	{
@@ -112,7 +117,7 @@ public class AddressTable
 						
 					} catch (Exception ex)
 					{
-						ex.printStackTrace();
+						LOG.log(Level.WARNING, "", ex);
 						// TODO: report exception to user
 					}
 				} else

@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.StringReader;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 
 /**
@@ -43,6 +44,9 @@ import java.util.StringTokenizer;
  */
 public class ZCashInstallationObserver
 {
+    
+    private static final Logger LOG = Logger.getLogger(ZCashInstallationObserver.class.getName());
+    
 	public static class DaemonInfo
 	{
 		public DAEMON_STATUS status;
@@ -83,7 +87,7 @@ public class ZCashInstallationObserver
 			zcashcli = OSUtil.findZCashCommand("zcash-cli");
 		}
 
-		System.out.println("Using ZCash utilities: " +
+		LOG.info("Using ZCash utilities: " +
 		                   "zcashd: "    + ((zcashd != null) ? zcashd.getCanonicalPath() : "<MISSING>") + ", " +
 		                   "zcash-cli: " + ((zcashcli != null) ? zcashcli.getCanonicalPath() : "<MISSING>"));
 

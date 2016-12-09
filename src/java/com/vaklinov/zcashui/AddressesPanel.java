@@ -38,6 +38,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -61,6 +63,9 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 public class AddressesPanel
 	extends JPanel
 {
+    
+    private static final Logger LOG = Logger.getLogger(AddressesPanel.class.getName());
+    
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
 
@@ -132,7 +137,7 @@ public class AddressesPanel
 					long start = System.currentTimeMillis();
 					String[][] data = AddressesPanel.this.getAddressBalanceDataFromWallet();
 					long end = System.currentTimeMillis();
-					System.out.println("Gathering of address/balance table data done in " + (end - start) + "ms." );
+					LOG.fine("Gathering of address/balance table data done in " + (end - start) + "ms." );
 					
 				    return data;
 				}
@@ -149,7 +154,7 @@ public class AddressesPanel
 					AddressesPanel.this.updateWalletAddressBalanceTableAutomated();
 				} catch (Exception ex)
 				{
-					ex.printStackTrace();
+					LOG.log(Level.WARNING, "", ex);
 					AddressesPanel.this.errorReporter.reportError(ex);
 				}
 			}
@@ -179,7 +184,7 @@ public class AddressesPanel
 						AddressesPanel.this.setCursor(oldCursor);
 					}
 					
-					ex.printStackTrace();
+					LOG.log(Level.WARNING, "", ex);
 					AddressesPanel.this.errorReporter.reportError(ex, false);
 				}
 			}
@@ -256,7 +261,7 @@ public class AddressesPanel
 			this.updateWalletAddressBalanceTableInteractive();
 		} catch (Exception e)
 		{
-			e.printStackTrace();			
+			LOG.log(Level.WARNING, "", e);			
 			AddressesPanel.this.errorReporter.reportError(e, false);
 		}
 	}
@@ -271,7 +276,7 @@ public class AddressesPanel
 
 		if (Util.arraysAreDifferent(lastAddressBalanceData, newAddressBalanceData))
 		{
-			System.out.println("Updating table of addresses/balances I...");
+			LOG.fine("Updating table of addresses/balances I...");
 			this.remove(addressBalanceTablePane);
 			this.add(addressBalanceTablePane = new JScrollPane(
 			             addressBalanceTable = this.createAddressBalanceTable(newAddressBalanceData)),
@@ -299,7 +304,7 @@ public class AddressesPanel
 		if ((newAddressBalanceData != null) && 
 			Util.arraysAreDifferent(lastAddressBalanceData, newAddressBalanceData))
 		{
-			System.out.println("Updating table of addresses/balances A...");
+			LOG.fine("Updating table of addresses/balances A...");
 			this.remove(addressBalanceTablePane);
 			this.add(addressBalanceTablePane = new JScrollPane(
 			             addressBalanceTable = this.createAddressBalanceTable(newAddressBalanceData)),
