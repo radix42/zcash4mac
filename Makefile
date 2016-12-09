@@ -11,6 +11,7 @@ appbundle:
 	ant -f src/build/build.xml osxbundle
 	mkdir -p $(APPBUNDLE)/Contents/Frameworks
 	cp macosx/first-run.sh $(APPBUNDLEEXE)/
+	cp macosx/logging.properties $(APPBUNDLEEXE)/
 
 icons: macosx/$(APPNAME)Icon.png appbundle
 #	rm -rf macosx/$(APPNAME).iconset
