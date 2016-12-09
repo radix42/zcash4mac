@@ -1,6 +1,7 @@
 package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.io.File;
 import java.io.IOException;
@@ -81,11 +82,7 @@ public class StartupProgressDialog extends JWindow {
         
         if (!shouldStartZCashd) {
             LOG.info("zcashd already running");
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    dispose();
-                }
-            });
+            doDispose();
             return;
         }
         
@@ -99,18 +96,10 @@ public class StartupProgressDialog extends JWindow {
             if (code == null || (code.asInt() != STARTUP_ERROR_CODE))
                 break;
             final String message = info.getString("message", "???");
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    progressLabel.setText(message);
-                }
-            });
+            setProgressText(message);
         }
         LOG.info("zcashd started");
-        SwingUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                dispose();
-            }
-        });
+        doDispose();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 LOG.info("Stopping zcashd because we started it");
@@ -127,6 +116,14 @@ public class StartupProgressDialog extends JWindow {
                 }
             }
         });
+    }
+    
+    private void doDispose() {
+        SwingUtilities.invokeLater(() -> {dispose();});
+    }
+    
+    public void setProgressText(final String text) {
+        SwingUtilities.invokeLater(() -> {progressLabel.setText(text);});
     }
     
     private void performOSXBundleLaunch() throws IOException, InterruptedException {
