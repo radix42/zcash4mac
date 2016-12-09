@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -21,6 +23,8 @@ import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 
 public class StartupProgressDialog extends JWindow {
+    
+    private static final Logger LOG = Logger.getLogger(StartupProgressDialog.class.getName());
 
     private static final int POLL_PERIOD = 250;
     private static final int STARTUP_ERROR_CODE = -28;
@@ -65,7 +69,7 @@ public class StartupProgressDialog extends JWindow {
                 performOSXBundleLaunch();
         }
         
-        System.out.println("trying to start zcashd");
+        LOG.info("trying to start zcashd");
         final Process daemonProcess = clientCaller.startDaemon();
         Thread.sleep(POLL_PERIOD); // just a little extra
         while(true) {
@@ -81,7 +85,7 @@ public class StartupProgressDialog extends JWindow {
                 }
             });
         }
-        System.out.println("zcashd started");
+        LOG.info("zcashd started");
         SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 dispose();
@@ -90,20 +94,20 @@ public class StartupProgressDialog extends JWindow {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 if (daemonProcess.isAlive()) {
-                    System.out.println("Stopping zcashd because we started it");
+                    LOG.info("Stopping zcashd because we started it");
                     try {
                         clientCaller.stopDaemon();
                     } catch (Exception bad) {
-                        System.out.println("Couldn't stop zcashd!");
-                        bad.printStackTrace();
+                        LOG.log(Level.WARNING,"Couldn't stop zcashd!",bad);
                     }
                 } else
-                    System.out.println("not stopping zcashd");
+                    LOG.info("not stopping zcashd");
             }
         });
     }
     
     private void performOSXBundleLaunch() throws IOException, InterruptedException {
+        LOG.info("performing OSX Bundle-specific launch");
         File bundlePath = new File(System.getProperty("zcash.location.dir"));
         bundlePath = bundlePath.getCanonicalFile();
         

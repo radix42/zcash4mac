@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -41,6 +43,8 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 
 public class AddressBookPanel extends JPanel {
+    
+    private static final Logger LOG = Logger.getLogger(AddressBookPanel.class.getName());
 
     private static class AddressBookEntry {
         final String name,address;
@@ -131,9 +135,12 @@ public class AddressBookPanel extends JPanel {
                 entries.add(new AddressBookEntry(name,address));
             }
         }
+        
+        LOG.info("loaded "+entries.size()+" address book entries");
     }
     
     private void saveEntriesToDisk() {
+        LOG.info("Saving "+entries.size()+" addresses");
         try {
             File addressBookFile = new File(OSUtil.getSettingsDirectory(),"addressBook.csv");
             try (PrintWriter printWriter = new PrintWriter(new FileWriter(addressBookFile))) {
@@ -141,8 +148,7 @@ public class AddressBookPanel extends JPanel {
                     printWriter.println(entry.address+","+entry.name);
             }
         } catch (IOException bad) {
-            System.out.println("Saving Address Book Failed!!!!");
-            bad.printStackTrace();
+            LOG.log(Level.WARNING,"Saving Address Book Failed!!!!",bad);
         }
     }
     

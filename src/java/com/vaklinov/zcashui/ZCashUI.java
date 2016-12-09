@@ -43,6 +43,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -69,6 +71,8 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionExcep
 public class ZCashUI
     extends JFrame
 {
+    private static final Logger LOG = Logger.getLogger(ZCashUI.class.getName());
+    
     private ZCashInstallationObserver installationObserver;
     private ZCashClientCaller clientCaller;
     private StatusUpdateErrorReporter errorReporter;
@@ -182,7 +186,7 @@ public class ZCashUI
                 		ad.setVisible(true);
                 	} catch (UnsupportedEncodingException uee)
                 	{
-                		uee.printStackTrace();
+                		LOG.log(Level.WARNING, "", uee);
                 		ZCashUI.this.errorReporter.reportError(uee);
                 	}
                 }
@@ -275,7 +279,7 @@ public class ZCashUI
                 } catch (IOException ioe)
                 {
                     /* TODO: report exceptions to the user */
-                    ioe.printStackTrace();
+                    LOG.log(Level.WARNING, "", ioe);
                 }
 
                 JOptionPane.showMessageDialog(
@@ -299,7 +303,7 @@ public class ZCashUI
 
     public void exitProgram()
     {
-        System.out.println("Exiting ...");
+        LOG.info("Exiting ...");
 
         this.dashboard.stopThreadsAndTimers();
 
@@ -314,17 +318,17 @@ public class ZCashUI
     {
         try
         {
-            System.out.println("Starting ZCash Swing Wallet ...");
-            System.out.println("OS: " + System.getProperty("os.name") + " = " + OSUtil.getOSType());
-            System.out.println("Current directory: " + new File(".").getCanonicalPath());
-            System.out.println("Class path: " + System.getProperty("java.class.path"));
-            System.out.println("Environment PATH: " + System.getenv("PATH"));
+            LOG.info("Starting ZCash Swing Wallet ...");
+            LOG.info("OS: " + System.getProperty("os.name") + " = " + OSUtil.getOSType());
+            LOG.info("Current directory: " + new File(".").getCanonicalPath());
+            LOG.info("Class path: " + System.getProperty("java.class.path"));
+            LOG.info("Environment PATH: " + System.getenv("PATH"));
 
             ////////////////////////////////////////////////////////////
             if (OSUtil.getOSType() != OSUtil.OS_TYPE.MAC_OS) {
                 for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
                 {
-                    System.out.println("Available look and feel: " + ui.getName() + " " + ui.getClassName());
+                    LOG.info("Available look and feel: " + ui.getName() + " " + ui.getClassName());
                     if (ui.getName().equals("Nimbus"))
                     {
                         UIManager.setLookAndFeel(ui.getClassName());
@@ -344,18 +348,18 @@ public class ZCashUI
 
         } catch (InstallationDetectionException ide)
         {
-            ide.printStackTrace();
+            LOG.log(Level.WARNING,"ide",ide);
             JOptionPane.showMessageDialog(
                 null,
                 "This program was started in directory: " + OSUtil.getProgramDirectory() + "\n" +
                 ide.getMessage() + "\n" +
-                "See the console output for more detailed error information!",
+                "See the log file for more detailed error information!",
                 "Installation error",
                 JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         } catch (WalletCallException wce)
         {
-            wce.printStackTrace();
+            LOG.log(Level.WARNING, "wce", wce);
 
             if ((wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Verifying blocks")      != -1)  ||
             	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Rescanning")            != -1)  ||
@@ -386,7 +390,7 @@ public class ZCashUI
             System.exit(2);
         } catch (Exception e)
         {
-            e.printStackTrace();
+            LOG.log(Level.WARNING, "Generic exception", e);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(baos);
             e.printStackTrace(ps);

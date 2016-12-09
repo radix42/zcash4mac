@@ -42,6 +42,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
@@ -61,6 +63,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class DataTable 
 	extends JTable 
 {
+    
+    private static final Logger LOG = Logger.getLogger(DataTable.class.getName());
+    
 	protected int lastRow = -1;
 	protected int lastColumn = -1;
 	
@@ -108,7 +113,7 @@ public class DataTable
 					DataTable.this.exportToCSV();						
 				} catch (Exception ex)
 				{
-					ex.printStackTrace();
+					LOG.log(Level.WARNING, "", ex);
 					// TODO: better error handling
 					JOptionPane.showMessageDialog(
 							DataTable.this.getRootPane().getParent(), 

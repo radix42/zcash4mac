@@ -28,7 +28,8 @@
  **********************************************************************************/
 package com.vaklinov.zcashui;
 
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This thread may be used to periodically and asynchronously load data if the load operation 
@@ -42,6 +43,9 @@ package com.vaklinov.zcashui;
 public class DataGatheringThread<T>
 	extends Thread
 {	
+    
+    private static final Logger LOG = Logger.getLogger(DataGatheringThread.class.getName());
+    
 	/**
 	 * All implementations must provide an impl. of this interface to 
 	 * gather the actual data.
@@ -146,7 +150,7 @@ public class DataGatheringThread<T>
 				} catch (InterruptedException ie)
 				{
 					// One of the rare cases where we do nothing
-					ie.printStackTrace();
+				    LOG.log(Level.WARNING, "interrupted", ie);
 				}
 			}
 			
@@ -169,7 +173,7 @@ public class DataGatheringThread<T>
 			localData = this.gatherer.gatherData();
 		} catch (Exception e)
 		{
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "", e);
 			if (this.errorReporter != null)
 			{
 				this.errorReporter.reportError(e);
