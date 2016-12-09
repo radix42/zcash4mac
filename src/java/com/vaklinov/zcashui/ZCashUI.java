@@ -73,6 +73,14 @@ public class ZCashUI
 {
     private static final Logger LOG = Logger.getLogger(ZCashUI.class.getName());
     
+    private static final String VERSION;
+    static {
+        String version = System.getProperty("wallet.version","@version@");
+        if ("@version@".equals(version))
+            version = "Custom Version";
+        VERSION = version;
+    }
+    
     private ZCashInstallationObserver installationObserver;
     private ZCashClientCaller clientCaller;
     private StatusUpdateErrorReporter errorReporter;
@@ -95,7 +103,7 @@ public class ZCashUI
     public ZCashUI(ZCashClientCaller clientCaller)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.44 (beta)");
+        super("ZCash Swing Wallet UI "+VERSION);
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/ZCashSwingWalletUI-246x246.png")).getImage());
@@ -318,7 +326,7 @@ public class ZCashUI
     {
         try
         {
-            LOG.info("Starting ZCash Swing Wallet ...");
+            LOG.info("Starting ZCash Swing Wallet "+VERSION+"...");
             LOG.info("OS: " + System.getProperty("os.name") + " = " + OSUtil.getOSType());
             LOG.info("Current directory: " + new File(".").getCanonicalPath());
             LOG.info("Class path: " + System.getProperty("java.class.path"));
