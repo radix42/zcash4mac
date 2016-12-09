@@ -133,7 +133,7 @@ public class ZCashClientCaller
 	
 	public synchronized void stopDaemon() throws IOException,InterruptedException {
 	    CommandExecutor stopper = new CommandExecutor(
-	            new String[] {zcashcli.getCanonicalPath(),"--stop"});
+	            new String[] {zcashcli.getCanonicalPath(),"stop"});
 	    stopper.executeNoResult().waitFor();
 	}
 	

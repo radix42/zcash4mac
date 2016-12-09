@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,6 +70,25 @@ public class StartupProgressDialog extends JWindow {
                 performOSXBundleLaunch();
         }
         
+        LOG.info("checking if zcashd is already running...");
+        boolean shouldStartZCashd;
+        try {
+            clientCaller.getInfo();
+            shouldStartZCashd = false;
+        } catch (Exception e) {
+            shouldStartZCashd = true;
+        }
+        
+        if (!shouldStartZCashd) {
+            LOG.info("zcashd already running");
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    dispose();
+                }
+            });
+            return;
+        }
+        
         LOG.info("trying to start zcashd");
         final Process daemonProcess = clientCaller.startDaemon();
         Thread.sleep(POLL_PERIOD); // just a little extra
@@ -93,15 +113,18 @@ public class StartupProgressDialog extends JWindow {
         });
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                if (daemonProcess.isAlive()) {
-                    LOG.info("Stopping zcashd because we started it");
-                    try {
-                        clientCaller.stopDaemon();
-                    } catch (Exception bad) {
-                        LOG.log(Level.WARNING,"Couldn't stop zcashd!",bad);
-                    }
-                } else
-                    LOG.info("not stopping zcashd");
+                LOG.info("Stopping zcashd because we started it");
+                try {
+                    clientCaller.stopDaemon();
+                    daemonProcess.waitFor(1000, TimeUnit.MILLISECONDS);
+                    if (daemonProcess.isAlive()) {
+                        LOG.info("zcashd is still alive, killing forcefully");
+                        daemonProcess.destroyForcibly();
+                    } else
+                        LOG.info("zcashd shut down successfully");
+                } catch (Exception bad) {
+                    LOG.log(Level.WARNING,"Couldn't stop zcashd!",bad);
+                }
             }
         });
     }
