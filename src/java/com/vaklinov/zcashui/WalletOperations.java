@@ -401,4 +401,17 @@ public class WalletOperations
 			this.errorReporter.reportError(ex, false);
 		}
 	}
+	
+	public void importSinglePrivateKey()
+	{
+	       try
+	       {
+	           SingleKeyImportDialog kd = new SingleKeyImportDialog(this.parent, this.clientCaller);
+	           kd.setVisible(true);
+	           
+	       } catch (Exception ex)
+	       {
+	           this.errorReporter.reportError(ex, false);
+	       }
+	   }
 }

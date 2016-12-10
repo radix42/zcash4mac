@@ -98,6 +98,7 @@ public class ZCashUI
     private JMenuItem menuItemExportKeys;
     private JMenuItem menuItemImportKeys;
     private JMenuItem menuItemShowPrivateKey;
+    private JMenuItem menuItemImportSinglePrivateKey;
 
     private DashboardPanel dashboard;
     private AddressesPanel addresses;
@@ -166,6 +167,8 @@ public class ZCashUI
         menuItemImportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, accelaratorKeyMask));
         wallet.add(menuItemShowPrivateKey = new JMenuItem("Show private key...", KeyEvent.VK_P));
         menuItemShowPrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, accelaratorKeyMask));
+        wallet.add(menuItemImportSinglePrivateKey = new JMenuItem("Import one private key...", KeyEvent.VK_N));
+        menuItemImportSinglePrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, accelaratorKeyMask));
         
         mb.add(wallet);
 
@@ -258,6 +261,11 @@ public class ZCashUI
                     ZCashUI.this.walletOps.showPrivateKey();
                 }
             }
+       );
+       
+       menuItemImportSinglePrivateKey.addActionListener( (e) -> {
+                   ZCashUI.this.walletOps.importSinglePrivateKey();
+               }
        );
 
         // Close operation
