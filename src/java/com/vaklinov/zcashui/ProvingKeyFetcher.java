@@ -39,6 +39,15 @@ public class ProvingKeyFetcher {
     // TODO: add backups
     
     public void fetchIfMissing(StartupProgressDialog parent) throws IOException {
+        try {
+            verifyOrFetch(parent);
+        } catch (InterruptedIOException iox) {
+            JOptionPane.showMessageDialog(parent, "Zcash cannot proceed without a proving key.");
+            System.exit(-3);
+        }
+    }
+    
+    private void verifyOrFetch(StartupProgressDialog parent) throws IOException {
         File zCashParams = new File(System.getProperty("user.home") + "/Library/Application Support/ZcashParams");
         zCashParams = zCashParams.getCanonicalFile();
         
@@ -68,7 +77,7 @@ public class ProvingKeyFetcher {
             needsFetch = true;
         } else {
             parent.setProgressText("Verifying proving key...");
-            needsFetch = !checkSHA256(provingKeyFile);
+            needsFetch = !checkSHA256(provingKeyFile,parent);
             if (needsFetch)
                 LOG.info("proving key SHA 256 did not match");
         }
@@ -98,15 +107,12 @@ public class ProvingKeyFetcher {
             copy(pmis,os);
             os.close();
             LOG.info("finished fetch of proving key file");
-        } catch (InterruptedIOException cancelled) {
-            JOptionPane.showMessageDialog(null, "Zcash cannot proceed without a proving key.");
-            System.exit(-3);
         } finally {
             try {if (response != null)response.close();} catch (IOException ignore){}
             try {httpClient.close();} catch (IOException ignore){}
         }
         parent.setProgressText("Verifying downloaded proving key...");
-        if (!checkSHA256(provingKeyFile)) {
+        if (!checkSHA256(provingKeyFile, parent)) {
             LOG.info("fetched proving key file failed checksum");
             JOptionPane.showMessageDialog(parent, "Failed to download proving key.  Cannot continue");
             System.exit(-4);
@@ -123,7 +129,7 @@ public class ProvingKeyFetcher {
         os.flush();
     }
     
-    private static boolean checkSHA256(File provingKey) throws IOException {
+    private static boolean checkSHA256(File provingKey, Component parent) throws IOException {
         MessageDigest sha256;
         try {
             sha256 = MessageDigest.getInstance("SHA-256");
@@ -131,7 +137,10 @@ public class ProvingKeyFetcher {
             throw new RuntimeException(impossible);
         }
         try (InputStream is = new BufferedInputStream(new FileInputStream(provingKey))) {
-            DigestInputStream dis = new DigestInputStream(is, sha256);
+            ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(parent,"Verifying proving key",is);
+            pmis.getProgressMonitor().setMaximum(PROVING_KEY_SIZE);
+            pmis.getProgressMonitor().setMillisToPopup(10);
+            DigestInputStream dis = new DigestInputStream(pmis, sha256);
             byte [] temp = new byte[0x1 << 13];
             while(dis.read(temp) >= 0);
             byte [] digest = sha256.digest();
