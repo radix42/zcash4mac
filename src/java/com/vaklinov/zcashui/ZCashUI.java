@@ -148,7 +148,7 @@ public class ZCashUI
         JMenu file = new JMenu("Main");
         file.setMnemonic(KeyEvent.VK_M);
         int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
-        file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_A));
+	        file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_A));
         menuItemAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, accelaratorKeyMask));
         file.addSeparator();
         file.add(menuItemExit = new JMenuItem("Quit", KeyEvent.VK_Q));

@@ -144,7 +144,7 @@
 			<option value="-Dzcash.location.dir=$APP_ROOT/Contents/MacOS" />
 			<option value="-Dlaunching.from.appbundle=true" />
 			<option value="-Djava.util.logging.config.file=$APP_ROOT/Contents/MacOS/logging.properties" />
-			<option value="-Dwallet.name=@name@" />
+			<option value="-Dwallet.name=zcash4mac" />
 			<option value="-Dwallet.version=@version@" />
 	     </bundleapp>
 	</target>
