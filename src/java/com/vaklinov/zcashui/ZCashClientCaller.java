@@ -762,4 +762,58 @@ public class ZCashClientCaller
 		}
 	}
 
+
+   // Imports a private key - tries both possibilities T/Z
+   public void importPrivateKey(String key)
+       throws WalletCallException, IOException, InterruptedException
+   {
+       // First try a Z key
+       String[] params = new String[] { this.zcashcli.getCanonicalPath(), "z_importkey", key };
+       CommandExecutor caller = new CommandExecutor(params);
+       String strResult = caller.execute();
+       
+       if ((strResult == null) || (strResult.trim().length() <= 0))
+       {
+           return;
+       }
+       
+       // Obviously we have an error trying to import a Z key
+       if (strResult.trim().toLowerCase().startsWith("error:"))
+       {
+                // Expecting an error of a T address key
+                String jsonPart = strResult.substring(strResult.indexOf("{"));
+            JsonValue response = null;
+            try
+            {
+               response = Json.parse(jsonPart);
+            } catch (ParseException pe)
+            {
+                throw new WalletCallException(jsonPart + "\n" + pe.getMessage() + "\n", pe);
+            }
+
+            JsonObject respObject = response.asObject();
+            if ((respObject.getDouble("code", +123) == -1) &&
+                (respObject.getString("message", "ERR").indexOf("wrong network type") != -1))
+            {
+                // Obviously T address - do nothing here
+            } else
+            {
+                throw new WalletCallException("Unexpected response from wallet: " + strResult);
+            }
+       } else
+       {
+           throw new WalletCallException("Unexpected response from wallet: " + strResult);
+       }
+       
+       // Second try a T key
+       strResult = this.executeCommandAndGetSingleStringResponse("importprivkey", key);
+       
+       if ((strResult == null) || (strResult.trim().length() <= 0))
+       {
+           return;
+       }
+       
+       // Obviously an error
+       throw new WalletCallException("Unexpected response from wallet: " + strResult);
+   }
 }

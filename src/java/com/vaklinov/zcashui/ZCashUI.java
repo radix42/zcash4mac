@@ -73,8 +73,12 @@ public class ZCashUI
 {
     private static final Logger LOG = Logger.getLogger(ZCashUI.class.getName());
     
-    private static final String VERSION;
+    private static final String NAME,VERSION;
     static {
+        String name = System.getProperty("wallet.name","@name@");
+        if ("@name@".equals(name))
+            name = "ZCash Swing Wallet UI";
+        NAME = name;
         String version = System.getProperty("wallet.version","@version@");
         if ("@version@".equals(version))
             version = "Custom Version";
@@ -94,6 +98,7 @@ public class ZCashUI
     private JMenuItem menuItemExportKeys;
     private JMenuItem menuItemImportKeys;
     private JMenuItem menuItemShowPrivateKey;
+    private JMenuItem menuItemImportSinglePrivateKey;
 
     private DashboardPanel dashboard;
     private AddressesPanel addresses;
@@ -103,7 +108,7 @@ public class ZCashUI
     public ZCashUI(ZCashClientCaller clientCaller)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI "+VERSION);
+        super(NAME + " "+VERSION);
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/ZCashSwingWalletUI-246x246.png")).getImage());
@@ -162,6 +167,8 @@ public class ZCashUI
         menuItemImportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, accelaratorKeyMask));
         wallet.add(menuItemShowPrivateKey = new JMenuItem("Show private key...", KeyEvent.VK_P));
         menuItemShowPrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, accelaratorKeyMask));
+        wallet.add(menuItemImportSinglePrivateKey = new JMenuItem("Import one private key...", KeyEvent.VK_N));
+        menuItemImportSinglePrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, accelaratorKeyMask));
         
         mb.add(wallet);
 
@@ -255,6 +262,11 @@ public class ZCashUI
                 }
             }
        );
+       
+       menuItemImportSinglePrivateKey.addActionListener( (e) -> {
+                   ZCashUI.this.walletOps.importSinglePrivateKey();
+               }
+       );
 
         // Close operation
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -326,7 +338,7 @@ public class ZCashUI
     {
         try
         {
-            LOG.info("Starting ZCash Swing Wallet "+VERSION+"...");
+            LOG.info("Starting "+NAME+" "+VERSION+"...");
             LOG.info("OS: " + System.getProperty("os.name") + " = " + OSUtil.getOSType());
             LOG.info("Current directory: " + new File(".").getCanonicalPath());
             LOG.info("Class path: " + System.getProperty("java.class.path"));
