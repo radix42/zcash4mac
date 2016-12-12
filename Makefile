@@ -1,8 +1,8 @@
 .PHONY: default
 default: macapp ;
 
-APPNAME=ZCashSwingWalletUI
-APPBUNDLE=build/osxapp/ZCashSwingWalletUI.app
+APPNAME=zcash4mac
+APPBUNDLE=build/osxapp/zcash4mac.app
 APPBUNDLECONTENTS=$(APPBUNDLE)/Contents
 APPBUNDLEEXE=$(APPBUNDLECONTENTS)/MacOS
 APPBUNDLERESOURCES=$(APPBUNDLECONTENTS)/Resources
@@ -28,8 +28,7 @@ icons: macosx/$(APPNAME)Icon.png appbundle
 #	cp macosx/$(APPNAME)Icon.png macosx/$(APPNAME).iconset/icon_512x512@2x.png
 #	iconutil -c icns -o macosx/$(APPNAME).icns macosx/$(APPNAME).iconset
 	cp macosx/$(APPNAME).icns $(APPBUNDLEICON)/
-	sed -i.bak 's/GenericApp.icns/ZCashSwingWalletUI.icns/' $(APPBUNDLECONTENTS)/Info.plist
-	rm $(APPBUNDLECONTENTS)/Info.plist.bak
+	sed -i '' 's/GenericApp.icns/zcash4mac.icns/' $(APPBUNDLECONTENTS)/Info.plist
 	rm $(APPBUNDLERESOURCES)/GenericApp.icns
 
 zcash-bin: appbundle
@@ -46,6 +45,7 @@ macapp: zcash-bin icons
 
 NAME ?= $(APPNAME)
 VERSION ?= 1.0.3
+BUILD = `git rev-list HEAD | wc -l|tr -d [:space:]`
 
 SOURCE_DIR ?= build/osxapp
 SOURCE_FILES ?= $(NAME).app
@@ -56,8 +56,8 @@ TEMPLATE_SIZE ?= 250m
 ################################################################################
 # DMG building. No editing should be needed beyond this point.
 ################################################################################
-
-MASTER_DMG=$(NAME)-$(VERSION).dmg
+DMGVERSION=$(VERSION)-$(BUILD)
+MASTER_DMG=$(NAME)-$(DMGVERSION).dmg
 WC_DMG=wc.dmg
 WC_DIR=wc
 

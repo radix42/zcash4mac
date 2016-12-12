@@ -131,8 +131,8 @@
 		<mkdir dir="${osx.app.dir}" />
 		<bundleapp 
 		  outputdirectory="${osx.app.dir}"
-		  name="${ant.project.name}" 
-		  displayname="${ant.project.name}"
+		  name="zcash4mac" 
+		  displayname="zcash4mac"
 		  identifier="zcash.wallet.ui"
 		  mainclassname="${main-class}" >
 			<runtime dir="${env.JAVA_HOME}"/>
