@@ -104,7 +104,7 @@ public class OSUtil
 	{
 		// TODO: this way of finding the dir is JAR name dependent - tricky, may not work
 		// if program is repackaged as different JAR!
-		final String JAR_NAME = "ZCashSwingWalletUI.jar";
+		final String JAR_NAME = ZCashUI.NAME+".jar";
 		String cp = System.getProperty("java.class.path");
 		if ((cp != null) && (cp.indexOf(File.pathSeparator) == -1) &&
 			(cp.endsWith(JAR_NAME)))
@@ -157,9 +157,9 @@ public class OSUtil
 	    File dir;
 	    OS_TYPE os = getOSType();
 	    if (os == OS_TYPE.MAC_OS)
-	        dir = new File(userHome, "Library/Application Support/ZCashSwingWalletUI");
+	        dir = new File(userHome, "Library/Application Support/"+ZCashUI.NAME);
 	    else
-	        dir = new File(userHome + "/.ZCashSwingWalletUI");
+	        dir = new File(userHome + "/."+ZCashUI.NAME);
 		if (!dir.exists())
 		{
 			dir.mkdirs();
