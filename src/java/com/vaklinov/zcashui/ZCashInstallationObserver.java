@@ -96,7 +96,7 @@ public class ZCashInstallationObserver
 			throw new InstallationDetectionException(
 				"The ZCash GUI Wallet installation directory " + installDir + " needs\nto contain " +
 				"the command line utilities zcashd and zcash-cli. At least one of them is missing! \n" +
-				"Please place files ZCashSwingWalletUI.jar, zcash-cli, zcashd in the same directory.");
+				"Please place files "+ZCashUI.NAME+".jar, zcash-cli, zcashd in the same directory.");
 		}
 	}
 

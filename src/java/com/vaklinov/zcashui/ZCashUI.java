@@ -73,7 +73,7 @@ public class ZCashUI
 {
     private static final Logger LOG = Logger.getLogger(ZCashUI.class.getName());
     
-    private static final String NAME,VERSION;
+    public static final String NAME,VERSION;
     static {
         String name = System.getProperty("wallet.name","@name@");
         if ("@name@".equals(name))
@@ -111,7 +111,7 @@ public class ZCashUI
         super(NAME + " "+VERSION);
         ClassLoader cl = this.getClass().getClassLoader();
 
-        this.setIconImage(new ImageIcon(cl.getResource("images/ZCashSwingWalletUI-246x246.png")).getImage());
+        this.setIconImage(new ImageIcon(cl.getResource("images/"+NAME+"-246x246.png")).getImage());
 
         Container contentPane = this.getContentPane();
 
