@@ -6,7 +6,7 @@ It has since diverged greatly from upstream and is unlikely to be merged, althou
 
 This fork is not really intended for standalone use.  radix42 maintains a complete OS X/Mac OS installation package here:
 
-https://github.com/radix42/zcash-swing-wallet-ui
+https://github.com/radix42/zcash4mac
 
 Usually what happens is I write the Java bits of the wallet and push here, then radix42 pulls into his repo and builds the Mac installer.
 
