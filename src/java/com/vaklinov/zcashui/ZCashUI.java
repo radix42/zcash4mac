@@ -71,8 +71,6 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionExcep
 public class ZCashUI
     extends JFrame
 {
-    private static final Logger LOG = Logger.getLogger(ZCashUI.class.getName());
-    
     public static final String NAME,VERSION;
     static {
         String name = System.getProperty("wallet.name","@name@");
@@ -83,7 +81,17 @@ public class ZCashUI
         if ("@version@".equals(version))
             version = "Custom Version";
         VERSION = version;
+     
+        // this is a hack to get the settings dir created before logging
+        // subsystem is initialized.
+        try {
+            OSUtil.getSettingsDirectory();
+        } catch (IOException bad) {
+            throw new RuntimeException(bad);
+        }
     }
+    
+    private static final Logger LOG = Logger.getLogger(ZCashUI.class.getName());
     
     private ZCashInstallationObserver installationObserver;
     private ZCashClientCaller clientCaller;
