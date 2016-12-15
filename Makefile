@@ -10,7 +10,7 @@ APPBUNDLEICON=$(APPBUNDLECONTENTS)/Resources
 BUILD ?= $(shell git rev-list HEAD | wc -l|tr -d [:space:])
 VERSION ?= 1.0.4-$(BUILD)
 appbundle: 
-	sec -i 'bak' "s/@version@/$VERSION/" src/build/build.xml
+	sed -i '.bak' 's/@version@/'"$(VERSION)"'/' src/build/build.xml
 	ant -f src/build/build.xml osxbundle
 	mv src/build/build.xml.bak src/build/build.xml
 	mkdir -p $(APPBUNDLE)/Contents/Frameworks
