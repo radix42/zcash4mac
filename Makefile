@@ -32,14 +32,14 @@ macapp: zcash-bin icons
 
 NAME ?= $(APPNAME)
 #BUILD = `git rev-list HEAD | wc -l|tr -d [:space:]`
-VERSION ?= 1.0.3
+VERSION ?= 1.0.4
 
 
 SOURCE_DIR ?= build/osxapp
 SOURCE_FILES ?= $(NAME).app
 
 TEMPLATE_DMG ?= template.dmg
-TEMPLATE_SIZE ?= 250m
+TEMPLATE_SIZE ?= 200m
 
 ################################################################################
 # DMG building. No editing should be needed beyond this point.
