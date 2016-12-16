@@ -40,7 +40,7 @@ NAME ?= $(APPNAME)
 
 
 
-SOURCE_DIR ?= .
+SOURCE_DIR ?= build/osxapp
 SOURCE_FILES ?= $(NAME).app
 
 TEMPLATE_DMG ?= template.dmg
