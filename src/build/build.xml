@@ -147,7 +147,7 @@
 	                classpath=".:${env.JAVA_HOME}/lib/ant-javafx.jar"/>
 	
 		<fx:application id="wallet"
-			name="@name@" 
+			name="zcash4mac" 
 			mainClass="${main-class}" />
 		
 		<fx:resources id="appRes">
