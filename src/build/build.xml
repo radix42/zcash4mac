@@ -111,6 +111,20 @@
 		</fail>
 	</target>
 	
+	<!-- fail if signing identity is not defined -->
+    <target name="checkSigningIdentity">
+        <fail message="SIGN_WITH has to be set!">
+            <condition>
+                <or>
+                    <equals arg1="${env.SIGN_WITH}" arg2="" />
+                    <not>
+                        <isset property="env.SIGN_WITH" />
+                    </not>
+                </or>
+            </condition>
+        </fail>
+    </target>	
+	
 	<!-- fail if not on OSX -->
 	<target name="checkOSX">
 		 <fail message="This target can only run on OSX">
@@ -126,7 +140,7 @@
 	<!-- Java FX packager -->
 	<!-- ############################ -->
 	
-	<target name="osxbundle" depends="checkJavaHome,checkOSX,buildit">
+	<target name="osxbundle" depends="checkJavaHome,checkSigningIdentity,checkOSX,buildit">
 		
 	    <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"      
 	                uri="javafx:com.sun.javafx.tools.ant"
@@ -157,6 +171,8 @@
 				<fx:jvmarg value="-Dwallet.name=@name@" />
 				<fx:jvmarg value="-Dwallet.version=@version@"/>
 			</fx:platform>
+			
+			<fx:bundleArgument arg="mac.signing-key-user-name" value="${env.SIGN_WITH}"/>
 			
 		</fx:deploy>
 	</target>
