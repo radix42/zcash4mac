@@ -150,6 +150,14 @@
 			<fx:application refId="wallet" />
 			<fx:resources refid="appRes"/>
 			
+			<fx:platform>
+				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR" />
+				<fx:jvmarg value="-Dlaunching.from.appbundle=true" />
+				<fx:jvmarg value="-Djava.util.logging.config.file=$APPDIR/logging.properties" />
+				<fx:jvmarg value="-Dwallet.name=@name@" />
+				<fx:jvmarg value="-Dwallet.version=@version@"/>
+			</fx:platform>
+			
 		</fx:deploy>
 	</target>
 </project>
