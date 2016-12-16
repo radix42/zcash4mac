@@ -153,6 +153,7 @@
 		<fx:resources id="appRes">
 			<fx:fileset dir="lib" includes="**/*.jar" />
 			<fx:fileset file="${jar.dir}/${ant.project.name}.jar" />
+			<fx:fileset type="license" file="macosx/license.txt" />
 		</fx:resources>
 		
 		<fx:deploy 
