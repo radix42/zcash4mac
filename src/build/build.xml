@@ -27,7 +27,8 @@
  * THE SOFTWARE.                                    
  *
 -->
-<project name="ZCashSwingWalletUI" basedir="../.." default="buildit">
+<project name="ZCashSwingWalletUI" basedir="../.." default="buildit"
+	xmlns:fx="javafx:com.sun.javafx.tools.ant" >
 	
     <property name="src.dir"     value="src"/>
     <property name="build.dir"   value="build"/>
@@ -120,35 +121,44 @@
 		    	</condition>
 		 </fail>
 	</target>
-	
-	<!-- define the app bundler task -->
-	<taskdef name="bundleapp"
-	             classname="com.oracle.appbundler.AppBundlerTask"   
-	             classpath="${appbundler.jar}" />
-	
-	<!-- and the bundle target -->
-	<target name="osxbundle" depends="checkJavaHome,checkOSX,buildit">
-		<mkdir dir="${osx.app.dir}" />
-		<bundleapp 
-		  outputdirectory="${osx.app.dir}"
-		  name="zcash4mac" 
-		  displayname="zcash4mac"
-		  identifier="zcash.wallet.ui"
-		  mainclassname="${main-class}" >
-			<runtime dir="${env.JAVA_HOME}"/>
-			<classpath file="lib/commons-commons-codec-1.9.jar" />
-			<classpath file="lib/commons-logging-1.2.jar" />
-			<classpath file="lib/httpclient-4.5.2.jar" />
-			<classpath file="lib/httpcore-4.4.4.jar" />
-			<classpath file="${jar.dir}/${ant.project.name}.jar" />
-			<option value="-Dzcash.location.dir=$APP_ROOT/Contents/MacOS" />
-			<option value="-Dlaunching.from.appbundle=true" />
-			<option value="-Djava.util.logging.config.file=$APP_ROOT/Contents/MacOS/logging.properties" />
-			<option value="-Dwallet.name=zcash4mac" />
-			<option value="-Dwallet.version=1.0.4-178" />
-	     </bundleapp>
-	</target>
 		
+	<!-- ############################ -->
+	<!-- Java FX packager -->
+	<!-- ############################ -->
 	
+	<target name="osxbundle" depends="checkJavaHome,checkOSX,buildit">
+		
+	    <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"      
+	                uri="javafx:com.sun.javafx.tools.ant"
+	                classpath=".:${env.JAVA_HOME}/lib/ant-javafx.jar"/>
+	
+		<fx:application id="wallet"
+			name="@name@" 
+			mainClass="${main-class}" />
+		
+		<fx:resources id="appRes">
+			<fx:fileset dir="lib" includes="**/*.jar" />
+			<fx:fileset file="${jar.dir}/${ant.project.name}.jar" />
+		</fx:resources>
+		
+		<fx:deploy 
+			nativeBundles="DMG"
+			outdir="${osx.app.dir}"
+			outfile="${ant.project.name}"
+			>
+			
+			<fx:application refId="wallet" />
+			<fx:resources refid="appRes"/>
+			
+			<fx:platform>
+				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR" />
+				<fx:jvmarg value="-Dlaunching.from.appbundle=true" />
+				<fx:jvmarg value="-Djava.util.logging.config.file=$APPDIR/logging.properties" />
+				<fx:jvmarg value="-Dwallet.name=@name@" />
+				<fx:jvmarg value="-Dwallet.version=@version@"/>
+			</fx:platform>
+			
+		</fx:deploy>
+	</target>
 </project>
 
