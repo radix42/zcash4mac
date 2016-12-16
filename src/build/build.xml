@@ -148,7 +148,8 @@
 	
 		<fx:application id="wallet"
 			name="zcash4mac" 
-			mainClass="${main-class}" />
+			mainClass="${main-class}"
+			version="@version@"/>
 		
 		<fx:resources id="appRes">
 			<fx:fileset dir="lib" includes="**/*.jar" />
