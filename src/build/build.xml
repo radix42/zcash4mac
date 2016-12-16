@@ -161,6 +161,7 @@
 			nativeBundles="DMG"
 			outdir="${osx.app.dir}"
 			outfile="${ant.project.name}"
+			verbose="true"
 			>
 			
 			<fx:application refId="wallet" />
