@@ -16,6 +16,7 @@ appbundle:
 	mkdir -p $(APPBUNDLE)/Contents/Frameworks
 	cp macosx/first-run.sh $(APPBUNDLEEXE)/
 	cp macosx/logging.properties $(APPBUNDLEEXE)/
+	rm $(APPBUNDLECONTENTS)/PlugIns/jdk1.8.0_77.jdk/Contents/Home/jre/lib/libjfxmedia_qtkit.dylib
 
 icons: macosx/$(APPNAME)Icon.png appbundle
 	cp macosx/$(APPNAME).icns $(APPBUNDLEICON)/
@@ -39,7 +40,7 @@ NAME ?= $(APPNAME)
 
 
 
-SOURCE_DIR ?= build/osxapp
+SOURCE_DIR ?= .
 SOURCE_FILES ?= $(NAME).app
 
 TEMPLATE_DMG ?= template.dmg
