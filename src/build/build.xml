@@ -147,7 +147,8 @@
 	                classpath=".:${env.JAVA_HOME}/lib/ant-javafx.jar"/>
 	
 		<fx:application id="wallet"
-			name="@name@" 
+			name="@name@"
+			version="@version@"
 			mainClass="${main-class}" />
 		
 		<fx:resources id="appRes">
