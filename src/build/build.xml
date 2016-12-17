@@ -153,7 +153,7 @@
 		
 		<fx:resources id="appRes">
 			<fx:fileset type="jar" dir="lib" includes="**/*.jar" />
-			<fx:fileset type="license" file="macosx/license.txt" />
+			<fx:fileset type="data" file="macosx/logging.properties" />
 		</fx:resources>
 		
 		<fx:jar destfile="${jar.dir}/${ant.project.name}-combined.jar">
@@ -178,13 +178,14 @@
 			<fx:resources>
 				<fx:fileset type="jar" file="${jar.dir}/${ant.project.name}-combined.jar"/>
 	            <fx:fileset type="jar" dir="lib" includes="**/*.jar" />
+				<fx:fileset type="data" file="macosx/logging.properties" />
 	            <fx:fileset type="license" file="macosx/license.txt" />
 			</fx:resources>
 			
 			<fx:platform>
 				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR" />
 				<fx:jvmarg value="-Dlaunching.from.appbundle=true" />
-				<fx:jvmarg value="-Djava.util.logging.config.file=$APPDIR/logging.properties" />
+				<fx:jvmarg value="-Djava.util.logging.config.file=logging.properties" />
 				<fx:jvmarg value="-Dwallet.name=@name@" />
 				<fx:jvmarg value="-Dwallet.version=@version@"/>
 			</fx:platform>
