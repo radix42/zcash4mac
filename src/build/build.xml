@@ -140,7 +140,7 @@
 	<!-- Java FX packager -->
 	<!-- ############################ -->
 	
-	<target name="osxbundle" depends="checkJavaHome,checkSigningIdentity,checkOSX,buildit">
+	<target name="osxbundle" depends="checkJavaHome,checkSigningIdentity,checkOSX,jar">
 		
 	    <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"      
 	                uri="javafx:com.sun.javafx.tools.ant"
@@ -153,9 +153,18 @@
 		
 		<fx:resources id="appRes">
 			<fx:fileset type="jar" dir="lib" includes="**/*.jar" />
-			<fx:fileset type="jar" file="${jar.dir}/${ant.project.name}.jar" />
 			<fx:fileset type="license" file="macosx/license.txt" />
 		</fx:resources>
+		
+		<fx:jar destfile="${jar.dir}/${ant.project.name}-combined.jar">
+			<fx:application refId="wallet" />
+			<fx:resources refId="appRes" />
+			
+			 <fx:fileset dir="${classes.dir}">
+			        <include name="**/*"/>
+			 </fx:fileset>
+			
+		</fx:jar>
 		
 		<fx:deploy 
 			nativeBundles="DMG"
@@ -165,7 +174,12 @@
 			>
 			
 			<fx:application refId="wallet" />
-			<fx:resources refid="appRes"/>
+			
+			<fx:resources>
+				<fx:fileset type="jar" file="${jar.dir}/${ant.project.name}-combined.jar"/>
+	            <fx:fileset type="jar" dir="lib" includes="**/*.jar" />
+	            <fx:fileset type="license" file="macosx/license.txt" />
+			</fx:resources>
 			
 			<fx:platform>
 				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR" />
