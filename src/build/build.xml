@@ -183,7 +183,7 @@
 			</fx:resources>
 			
 			<fx:platform>
-				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR" />
+				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR/MacOS" />
 				<fx:jvmarg value="-Dlaunching.from.appbundle=true" />
 
 				<fx:jvmarg value="-Djava.util.logging.config.file=logging.properties" />
