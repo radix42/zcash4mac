@@ -64,8 +64,8 @@ public class AboutDialog
 		throws UnsupportedEncodingException
 	{
 		this.setTitle("About...");
-		this.setSize(600,  410);
-	    this.setLocation(100, 100);
+		this.setSize(600,  600);
+		this.setLocation(100, 100);
 		this.setLocationRelativeTo(parent);
 		this.setModal(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -76,7 +76,7 @@ public class AboutDialog
 		copyrigthPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		copyrigthPanel.setLayout(new BorderLayout(3, 3));
 		JLabel copyrightLabel = new JLabel();
-		String copyrightLabelString = "<html><body><span style=\"font-weight:bold\">zcash4mac</span><br/><br/>Copyright: David Mercer &lt;david@mercerweiss.com&gt;<br/><br/>This program is intended to make it easy to work with the Zcash client tools by providing a Graphical User Interface (GUI) that acts as a wrapper and presents the information in a user-friendly manner.<br/><br/><span style=\"font-weight:bold\">Disclaimer:</span> this program is not officially endorsed by or associated with the Zcash project or the Zcash Electric Coin Company.<br/><br/>Acknowledgements: This program includes the following: <br/><br/>ZCashSwingWalletUI Copyright (c) 2016 Ivan Vaklinov<br/><br>software for JSON processing (https://github.com/ralfstx/minimal-json) that is Copyright (c) 2015, 2016 EclipseSource.<br/><br/>The Java Runtime Environment, Copyright (c) 2015, 2016, Oracle and/or its affiliates. All rights reserved.<br/><br/>Zcash, Copyright (c) 2016 The Zcash developers<br/><br/>Berkeley DB 6.23, Copyright (c) 2016 Oracle<br/><br/></body></html>}";
+		String copyrightLabelString = "<html><body><span style=\"font-weight:bold\">zcash4mac</span><br/><br/>Copyright: David Mercer &lt;david@mercerweiss.com&gt;<br/><br/>This program is intended to make it easy to work with the Zcash client tools by providing a Graphical User Interface (GUI) that acts as a wrapper and presents the information in a user-friendly manner.<br/><br/><span style=\"font-weight:bold\">Disclaimer:</span> this program is not officially endorsed by or associated with the Zcash project or the Zcash Electric Coin Company.<br/><br/>Acknowledgements: This program includes the following: <br/><br/>ZCashSwingWalletUI Copyright (c) 2016 Ivan Vaklinov, Zlatin Balevsky<br/><br>software for JSON processing (https://github.com/ralfstx/minimal-json) that is Copyright (c) 2015, 2016 EclipseSource.<br/><br/>The Java Runtime Environment, Copyright (c) 2015, 2016, Oracle and/or its affiliates. All rights reserved.<br/><br/>Zcash, Copyright (c) 2016 The Zcash developers<br/><br/>Berkeley DB 6.23, Copyright (c) 2016 Oracle<br/><br/></body></html>}";
 		copyrightLabel.setText(copyrightLabelString);
 		copyrightLabel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		copyrigthPanel.add(copyrightLabel, BorderLayout.NORTH);
