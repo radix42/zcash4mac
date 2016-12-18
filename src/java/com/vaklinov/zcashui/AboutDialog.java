@@ -37,6 +37,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -57,6 +58,8 @@ import javax.swing.border.EtchedBorder;
 public class AboutDialog
 	extends JDialog
 {
+    private static final Logger LOG = Logger.getLogger(AboutDialog.class.getName());
+    
 	public AboutDialog(JFrame parent)
 		throws UnsupportedEncodingException
 	{
@@ -73,7 +76,7 @@ public class AboutDialog
 		copyrigthPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		copyrigthPanel.setLayout(new BorderLayout(3, 3));
 		JLabel copyrightLabel = new JLabel();
-		copyrightLabel.setText(new String(new byte[] {
+		String crazyEncodedString = new String(new byte[] {
 		(byte)0x3c,(byte)0x68,(byte)0x74,(byte)0x6d,(byte)0x6c,(byte)0x3e,(byte)0x3c,(byte)0x62,(byte)0x6f,(byte)0x64,(byte)0x79,
 				(byte)0x3e,(byte)0x3c,(byte)0x73,(byte)0x70,(byte)0x61,(byte)0x6e,(byte)0x20,(byte)0x73,(byte)0x74,(byte)0x79,
 				(byte)0x6c,(byte)0x65,(byte)0x3d,(byte)0x22,(byte)0x66,(byte)0x6f,(byte)0x6e,(byte)0x74,(byte)0x2d,(byte)0x77,
@@ -144,8 +147,9 @@ public class AboutDialog
 				(byte)0x2e,(byte)0x3c,(byte)0x62,(byte)0x72,(byte)0x2f,(byte)0x3e,(byte)0x3c,(byte)0x62,(byte)0x72,(byte)0x2f,
 				(byte)0x3e,(byte)0x3c,(byte)0x2f,(byte)0x62,(byte)0x6f,(byte)0x64,(byte)0x79,(byte)0x3e,(byte)0x3c,(byte)0x2f,
 				(byte)0x68,(byte)0x74,(byte)0x6d,(byte)0x6c,(byte)0x3e
-		    }, "UTF-8")
-		);
+		    }, "UTF-8");
+		LOG.info(crazyEncodedString);
+		copyrightLabel.setText(crazyEncodedString);
 		copyrightLabel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		copyrigthPanel.add(copyrightLabel, BorderLayout.NORTH);
 		
@@ -153,7 +157,7 @@ public class AboutDialog
 		JPanel PD = new JPanel();
 		PD.setLayout(new BorderLayout(3, 3));
 		PD.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		JLabel l1 = new JLabel(new String(new byte[] {
+		String crazyEncodedString2 = new String(new byte[] {
 				(byte)0x3c,(byte)0x68,(byte)0x74,(byte)0x6d,(byte)0x6c,(byte)0x3e,(byte)0x3c,(byte)0x62,(byte)0x6f,(byte)0x64,
 				(byte)0x79,(byte)0x3e,(byte)0x3c,(byte)0x73,(byte)0x70,(byte)0x61,(byte)0x6e,(byte)0x20,(byte)0x73,(byte)0x74,
 				(byte)0x79,(byte)0x6c,(byte)0x65,(byte)0x3d,(byte)0x22,(byte)0x66,(byte)0x6f,(byte)0x6e,(byte)0x74,(byte)0x2d,
@@ -191,24 +195,26 @@ public class AboutDialog
 				(byte)0x68,(byte)0x20,(byte)0x61,(byte)0x64,(byte)0x64,(byte)0x72,(byte)0x65,(byte)0x73,(byte)0x73,(byte)0x3a,
 				(byte)0x3c,(byte)0x62,(byte)0x72,(byte)0x2f,(byte)0x3e,(byte)0x3c,(byte)0x2f,(byte)0x62,(byte)0x6f,(byte)0x64,
 				(byte)0x79,(byte)0x3e,(byte)0x3c,(byte)0x2f,(byte)0x68,(byte)0x74,(byte)0x6d,(byte)0x6c,(byte)0x3e,
-		    }, "UTF-8")
-		);
+		    }, "UTF-8");
+		LOG.info(crazyEncodedString2);
+		JLabel l1 = new JLabel(crazyEncodedString2);
 		PD.add(l1, BorderLayout.NORTH);
 		JPanel PD2 = new JPanel();
 		PD2.setLayout(new BorderLayout(3, 3));
 		final JTextArea tar = new JTextArea();
 		tar.setEditable(false);
 		tar.setLineWrap(true);
-		tar.setText(new String(new byte[] {
+		String crazyEncodedString3 = new String(new byte[] {
 				(byte)0x74,(byte)0x31,(byte)0x56,(byte)0x41,(byte)0x67,(byte)0x67,(byte)0x6f,(byte)0x37,(byte)0x52,(byte)0x75,
 				(byte)0x73,(byte)0x4c,(byte)0x56,(byte)0x42,(byte)0x7a,(byte)0x48,(byte)0x53,(byte)0x65,(byte)0x59,(byte)0x62,
 				(byte)0x47,(byte)0x6b,(byte)0x78,(byte)0x44,(byte)0x51,(byte)0x51,(byte)0x68,(byte)0x4c,(byte)0x5a,(byte)0x79,
 				(byte)0x69,(byte)0x67,(byte)0x78,(byte)0x74,(byte)0x79,
-			}, "UTF-8")
-		);
+			}, "UTF-8");
+		LOG.info(crazyEncodedString3);
+		tar.setText(crazyEncodedString3);
 		PD2.add(tar, BorderLayout.CENTER);
 		JPanel PD3 = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		final JButton jb1 = new JButton(new String(new byte[] {
+		String crazyEncodedString4 = new String(new byte[] {
 				(byte)0x3c,(byte)0x68,(byte)0x74,(byte)0x6d,(byte)0x6c,(byte)0x3e,(byte)0x3c,(byte)0x62,(byte)0x6f,(byte)0x64,
 				(byte)0x79,(byte)0x3e,(byte)0x3c,(byte)0x73,(byte)0x70,(byte)0x61,(byte)0x6e,(byte)0x20,(byte)0x73,(byte)0x74,
 				(byte)0x79,(byte)0x6c,(byte)0x65,(byte)0x3d,(byte)0x22,(byte)0x66,(byte)0x6f,(byte)0x6e,(byte)0x74,(byte)0x2d,
@@ -220,7 +226,9 @@ public class AboutDialog
 				(byte)0x70,(byte)0x62,(byte)0x6f,(byte)0x61,(byte)0x72,(byte)0x64,(byte)0x3c,(byte)0x2f,(byte)0x73,(byte)0x70,
 				(byte)0x61,(byte)0x6e,(byte)0x3e,(byte)0x3c,(byte)0x2f,(byte)0x68,(byte)0x74,(byte)0x6d,(byte)0x6c,(byte)0x3e,
 				(byte)0x3c,(byte)0x2f,(byte)0x62,(byte)0x6f,(byte)0x64,(byte)0x79,(byte)0x3e,
-		    }, "UTF-8"));
+		    }, "UTF-8");
+		LOG.info(crazyEncodedString4);
+		final JButton jb1 = new JButton(crazyEncodedString4);
 		PD3.add(jb1);
 		jb1.addActionListener(new ActionListener() {
 			@Override
