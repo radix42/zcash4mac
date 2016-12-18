@@ -21,7 +21,7 @@
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
-  <string>1.0.4</string>
+  <string>@shortversion@</string>
   <key>CFBundleSignature</key>
   <string>ZC4M</string>
   <!-- See http://developer.apple.com/library/mac/#releasenotes/General/SubmittingToMacAppStore/_index.html
@@ -29,7 +29,7 @@
   <key>LSApplicationCategoryType</key>
   <string>Financial</string>
   <key>CFBundleVersion</key>
-  <string>201</string>
+  <string>@build@</string>
   <key>NSHumanReadableCopyright</key>
   <string>Copyright (C) 2016 David Mercer</string>
   <key>NSHighResolutionCapable</key>
