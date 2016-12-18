@@ -85,7 +85,7 @@ public class AboutDialog
 		JPanel PD = new JPanel();
 		PD.setLayout(new BorderLayout(3, 3));
 		PD.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		String donationString = "<html><body><span style="font-weight:bold">Donations accepted:</span> zcash4machas been brought to you through the efforts of community volunteers. If you find it useful please consider making a donation for its further development. Donations of <span style="font-weight:bold">any size</span> are accepted to the following ZCash address:<br/></body></html>";
+		String donationString = "<html><body><span style=\"font-weight:bold\">Donations accepted:</span> zcash4machas been brought to you through the efforts of community volunteers. If you find it useful please consider making a donation for its further development. Donations of <span style=\"font-weight:bold\">any size</span> are accepted to the following ZCash address:<br/></body></html>";
 		JLabel l1 = new JLabel(donationString);
 		PD.add(l1, BorderLayout.NORTH);
 		JPanel PD2 = new JPanel();
