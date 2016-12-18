@@ -8,28 +8,31 @@ APPBUNDLEEXE=$(APPBUNDLECONTENTS)/MacOS
 APPBUNDLERESOURCES=$(APPBUNDLECONTENTS)/Resources
 APPBUNDLEICON=$(APPBUNDLECONTENTS)/Resources
 BUILD ?= $(shell git rev-list HEAD | wc -l|tr -d [:space:])
-VERSION ?= 1.0.4-$(BUILD)
-appbundle: 
+SHORTVERSION = 1.0.4
+VERSION ?= $(SHORTVERSION)-$(BUILD)
+appbundle: zcash-bin
 	sed -i '.bak' 's/@version@/'"$(VERSION)"'/' src/build/build.xml
+	sed -i '.bak' 's/@shortversion@/'"$(SHORTVERSION)"'/; s/@build@/'"$(BUILD)"'/' package/macosx/Info.plist
 	ant -f src/build/build.xml osxbundle
 	mv src/build/build.xml.bak src/build/build.xml
-	mkdir -p $(APPBUNDLE)/Contents/Frameworks
-	cp macosx/first-run.sh $(APPBUNDLEEXE)/
-	cp macosx/logging.properties $(APPBUNDLEEXE)/
-	rm $(APPBUNDLECONTENTS)/PlugIns/jdk1.8.0_77.jdk/Contents/Home/jre/lib/libjfxmedia_qtkit.dylib
+	mv package/macosx/Info.plist.bak package/macosx/Info.plist
+#	mkdir -p $(APPBUNDLE)/Contents/Frameworks
+#	cp macosx/first-run.sh $(APPBUNDLEEXE)/
+#	cp macosx/logging.properties $(APPBUNDLEEXE)/
+#	rm $(APPBUNDLECONTENTS)/PlugIns/jdk1.8.0_77.jdk/Contents/Home/jre/lib/libjfxmedia_qtkit.dylib
 
 icons: macosx/$(APPNAME)Icon.png appbundle
 	cp macosx/$(APPNAME).icns $(APPBUNDLEICON)/
 	sed -i '' 's/GenericApp.icns/zcash4mac.icns/' $(APPBUNDLECONTENTS)/Info.plist
 	rm $(APPBUNDLERESOURCES)/GenericApp.icns
 
-zcash-bin: appbundle
-	cp macosx/zcash/src/zcashd $(APPBUNDLEEXE)/zcashd
-	cp macosx/zcash/src/zcash-cli $(APPBUNDLEEXE)/zcash-cli
-	dylibbundler -of -b -x $(APPBUNDLEEXE)/zcashd -d $(APPBUNDLE)/Contents/Frameworks/ -p @executable_path/../Frameworks/
-	dylibbundler -of -b -x $(APPBUNDLEEXE)/zcash-cli -d $(APPBUNDLE)/Contents/Frameworks/ -p @executable_path/../Frameworks/
+zcash-bin:
+	cp macosx/zcash/src/zcashd macosx/zcashd
+	cp macosx/zcash/src/zcash-cli macosx/zcash-cli
+	dylibbundler -of -b -x macosx/zcashd -d macosx/ -p @executable_path/
+	dylibbundler -of -b -x macosx/zcash-cli -d macosx/ -p @executable_path/
 
-macapp: zcash-bin icons
+macapp: appbundle
 
 ################################################################################
 # Customizable variables for dmg generation

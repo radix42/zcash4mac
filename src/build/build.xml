@@ -149,7 +149,7 @@
 		<fx:application id="wallet"
 			name="zcash4mac" 
 			mainClass="${main-class}"
-			version="1.0.4"/>
+			version="@version@"/>
 		
 		<fx:resources id="appRes">
 			<fx:fileset type="jar" dir="lib" includes="**/*.jar" />
@@ -177,18 +177,23 @@
 			
 			<fx:resources>
 				<fx:fileset type="jar" file="${jar.dir}/${ant.project.name}-combined.jar"/>
-	            <fx:fileset type="jar" dir="lib" includes="**/*.jar" />
+				<fx:fileset type="jar" dir="lib" includes="**/*.jar" />
 				<fx:fileset type="data" file="macosx/logging.properties" />
-	            <fx:fileset type="license" file="macosx/license.txt" />
+				<fx:fileset type"data" file="macosx/first-run.sh" />
+				<fx:fileset type"data" file="macosx/zcashd" />
+				<fx:fileset type"data" file="macosx/zcash-cli" />
+				<fx:fileset type"data" file="macosx/libstdc++.6.dylib" />
+				<fx:fileset type"data" file="macosx/libgcc_s.1.dylib" />
+				<fx:fileset type="license" file="macosx/license.txt" />
 			</fx:resources>
 			
 			<fx:platform>
-				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR/MacOS" />
+				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR/Java" />
 				<fx:jvmarg value="-Dlaunching.from.appbundle=true" />
 
 				<fx:jvmarg value="-Djava.util.logging.config.file=logging.properties" />
 				<fx:jvmarg value="-Dwallet.name=zcash4mac" />
-				<fx:jvmarg value="-Dwallet.version=1.0.4"/>
+				<fx:jvmarg value="-Dwallet.version=@version@"/>
 			</fx:platform>
 			
 			<fx:bundleArgument arg="mac.signing-key-user-name" value="${env.SIGN_WITH}"/>
