@@ -42,8 +42,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -121,7 +119,7 @@ public class DashboardPanel
 		
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 9));
 		JLabel logoLabel = new JLabel(new ImageIcon(
-			this.getClass().getClassLoader().getResource("images/"+ZCashUI.NAME+"-40x40.png")));
+			this.getClass().getClassLoader().getResource("images/Z-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
 		//tempPanel.add(new JLabel(" "));
 		JLabel zcLabel = new JLabel("Cash Wallet        ");
@@ -171,7 +169,7 @@ public class DashboardPanel
 					long start = System.currentTimeMillis();
 					DaemonInfo daemonInfo = DashboardPanel.this.installationObserver.getDaemonInfo();
 					long end = System.currentTimeMillis();
-					LOG.fine("Gathering of dashboard daemon status data done in " + (end - start) + "ms." );
+					System.out.println("Gathering of dashboard daemon status data done in " + (end - start) + "ms." );
 					
 					return daemonInfo;
 				}
@@ -188,7 +186,7 @@ public class DashboardPanel
 					DashboardPanel.this.updateDaemonStatusLabel();
 				} catch (Exception ex)
 				{
-					LOG.log(Level.WARNING, "", ex);
+					ex.printStackTrace();
 					DashboardPanel.this.errorReporter.reportError(ex);
 				}
 			}
@@ -215,7 +213,7 @@ public class DashboardPanel
 					    DashboardPanel.this.walletIsEncrypted = DashboardPanel.this.clientCaller.isWalletEncrypted();
 					}
 					
-					LOG.fine("Gathering of dashboard wallet balance data done in " + (end - start) + "ms." );
+					System.out.println("Gathering of dashboard wallet balance data done in " + (end - start) + "ms." );
 					
 					return balance;
 				}
@@ -232,7 +230,7 @@ public class DashboardPanel
 					DashboardPanel.this.updateWalletStatusLabel();
 				} catch (Exception ex)
 				{
-					LOG.log(Level.WARNING, "", ex);
+					ex.printStackTrace();
 					DashboardPanel.this.errorReporter.reportError(ex);
 				}
 			}
@@ -252,7 +250,7 @@ public class DashboardPanel
 					long start = System.currentTimeMillis();
 					String[][] data =  DashboardPanel.this.getTransactionsDataFromWallet();
 					long end = System.currentTimeMillis();
-					LOG.fine("Gathering of dashboard wallet transactions table data done in " + (end - start) + "ms." );
+					System.out.println("Gathering of dashboard wallet transactions table data done in " + (end - start) + "ms." );
 					
 					return data;
 				}
@@ -269,7 +267,7 @@ public class DashboardPanel
 					DashboardPanel.this.updateWalletTransactionsTable();
 				} catch (Exception ex)
 				{
-					LOG.log(Level.WARNING, "", ex);
+					ex.printStackTrace();
 					DashboardPanel.this.errorReporter.reportError(ex);
 				}
 			}
@@ -288,7 +286,7 @@ public class DashboardPanel
 					long start = System.currentTimeMillis();
 					NetworkAndBlockchainInfo data =  DashboardPanel.this.clientCaller.getNetworkAndBlockchainInfo();
 					long end = System.currentTimeMillis();
-					LOG.fine("Gathering of network and blockchain info data done in " + (end - start) + "ms." );
+					System.out.println("Gathering of network and blockchain info data done in " + (end - start) + "ms." );
 					
 					return data;
 				}
@@ -305,7 +303,7 @@ public class DashboardPanel
 					DashboardPanel.this.updateNetworkAndBlockchainLabel();
 				} catch (Exception ex)
 				{
-					LOG.log(Level.WARNING, "", ex);
+					ex.printStackTrace();
 					DashboardPanel.this.errorReporter.reportError(ex);
 				}
 			}
@@ -555,7 +553,7 @@ public class DashboardPanel
 			
 		if (Util.arraysAreDifferent(lastTransactionsData, newTransactionsData))
 		{
-			LOG.fine("Updating table of transactions...");
+			System.out.println("Updating table of transactions...");
 			this.remove(transactionsTablePane);
 			this.add(transactionsTablePane = new JScrollPane(
 			             transactionsTable = this.createTransactionsTable(newTransactionsData)),
@@ -685,8 +683,8 @@ public class DashboardPanel
 				trans[3] = df.format(amount);
 			} catch (NumberFormatException nfe)
 			{
-				LOG.log(Level.WARNING,"Error occurred while formatting amount: " + trans[3] + 
-						           " - " + nfe.getMessage() + "!",nfe);
+				System.out.println("Error occurred while formatting amount: " + trans[3] + 
+						           " - " + nfe.getMessage() + "!");
 			}
 			
 			// Confirmed?
@@ -697,8 +695,8 @@ public class DashboardPanel
 				trans[2] = isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed);
 			} catch (NumberFormatException nfe)
 			{
-				LOG.log(Level.WARNING,"Error occurred while formatting confirmations: " + trans[2] + 
-						           " - " + nfe.getMessage() + "!",nfe);
+				System.out.println("Error occurred while formatting confirmations: " + trans[2] + 
+						           " - " + nfe.getMessage() + "!");
 			}
 		}
 

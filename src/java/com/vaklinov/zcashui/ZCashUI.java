@@ -6,7 +6,7 @@
  * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
  *                                                 |___/
  *
- * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
+ * Copyright (c) 2017 David Mercer <radix42@gmail.com> and Ivan Vaklinov <ivan@vaklinov.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,13 +39,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -67,36 +63,15 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.DAEMON_STATUS;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionException;
 
+
 /**
  * Main ZCash Window.
  *
- * @author Ivan Vaklinov <ivan@vaklinov.com>
+ * @author David Mercer <radix42@gmail.com>
  */
 public class ZCashUI
     extends JFrame
 {
-    public static final String NAME,VERSION;
-    static {
-        String name = System.getProperty("wallet.name","@name@");
-        if ("@name@".equals(name))
-            name = "ZCash Swing Wallet UI";
-        NAME = name;
-        String version = System.getProperty("wallet.version","@version@");
-        if ("@version@".equals(version))
-            version = "Custom Version";
-        VERSION = version;
-     
-        // this is a hack to get the settings dir created before logging
-        // subsystem is initialized.
-        try {
-            OSUtil.getSettingsDirectory();
-        } catch (IOException bad) {
-            throw new RuntimeException(bad);
-        }
-    }
-    
-    private static final Logger LOG = Logger.getLogger(ZCashUI.class.getName());
-    
     private ZCashInstallationObserver installationObserver;
     private ZCashClientCaller clientCaller;
     private StatusUpdateErrorReporter errorReporter;
@@ -122,7 +97,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("zcash4win 1.0.5");
+        super("zcash4win");
         
         if (progressDialog != null)
         {
@@ -137,7 +112,7 @@ public class ZCashUI
 
         errorReporter = new StatusUpdateErrorReporter(this);
         installationObserver = new ZCashInstallationObserver(OSUtil.getProgramDirectory());
-        this.clientCaller = clientCaller;
+        clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
 
         // Build content
         tabs = new JTabbedPane();
@@ -153,9 +128,6 @@ public class ZCashUI
         tabs.addTab("Send cash ",
         		    new ImageIcon(cl.getResource("images/send.png")),
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter));
-        tabs.addTab("Address book ",
-                new ImageIcon(cl.getResource("images/address-book.png")),
-                bookPanel = new AddressBookPanel(sendPanel,tabs));
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
@@ -226,7 +198,7 @@ public class ZCashUI
                 		ad.setVisible(true);
                 	} catch (UnsupportedEncodingException uee)
                 	{
-                		LOG.log(Level.WARNING, "", uee);
+                		uee.printStackTrace();
                 		ZCashUI.this.errorReporter.reportError(uee);
                 	}
                 }
@@ -342,11 +314,14 @@ public class ZCashUI
                 } catch (IOException ioe)
                 {
                     /* TODO: report exceptions to the user */
-                    LOG.log(Level.WARNING, "", ioe);
+                    ioe.printStackTrace();
                 }
 
                 JOptionPane.showMessageDialog(
                     ZCashUI.this.getRootPane().getParent(),
+                    "The ZCash GUI Wallet is currently considered experimental. Use of this software\n" +
+                    "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
+                    "at this page: https://github.com/vaklinov/zcash-swing-wallet-ui\n\n" +
                     "This program is not officially endorsed by or associated with the ZCash project\n" +
                     "and the ZCash company. ZCash and the ZCash logo are trademarks of the\n" +
                     "Zerocoin Electric Coin Company.\n\n"+ 
@@ -371,7 +346,7 @@ public class ZCashUI
 
     public void exitProgram()
     {
-        LOG.info("Exiting ...");
+        System.out.println("Exiting ...");
 
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         
@@ -401,7 +376,7 @@ public class ZCashUI
         {
         	OS_TYPE os = OSUtil.getOSType();
         	
-            System.out.println("Starting zcash4win ...");
+            System.out.println("Starting ZCash Swing Wallet ...");
             System.out.println("OS: " + System.getProperty("os.name") + " = " + os);
             System.out.println("Current directory: " + new File(".").getCanonicalPath());
             System.out.println("Class path: " + System.getProperty("java.class.path"));
@@ -474,18 +449,18 @@ public class ZCashUI
 
         } catch (InstallationDetectionException ide)
         {
-            LOG.log(Level.WARNING,"ide",ide);
+            ide.printStackTrace();
             JOptionPane.showMessageDialog(
                 null,
                 "This program was started in directory: " + OSUtil.getProgramDirectory() + "\n" +
                 ide.getMessage() + "\n" +
-                "See the log file for more detailed error information!",
+                "See the console output for more detailed error information!",
                 "Installation error",
                 JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         } catch (WalletCallException wce)
         {
-            LOG.log(Level.WARNING, "wce", wce);
+            wce.printStackTrace();
 
             if ((wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Verifying blocks")      != -1)  ||
             	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Rescanning")            != -1)  ||
@@ -506,7 +481,7 @@ public class ZCashUI
                     null,
                     "There was a problem communicating with the ZCash daemon/wallet. \n" +
                     "Please ensure that the ZCash server zcashd is started (e.g. via \n" + 
-                    "command  \"zcashd.exe --daemon\"). Error message is: \n" +
+                    "command  \"zcashd --daemon\"). Error message is: \n" +
                      wce.getMessage() +
                     "See the console output for more detailed error information!",
                     "Wallet communication error",
@@ -516,16 +491,11 @@ public class ZCashUI
             System.exit(2);
         } catch (Exception e)
         {
-            LOG.log(Level.WARNING, "Generic exception", e);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(baos);
-            e.printStackTrace(ps);
-            ps.flush();
-            String stackTrace = new String(baos.toByteArray());
+            e.printStackTrace();
             JOptionPane.showMessageDialog(
                 null,
                 "A general unexpected critical error has occurred: \n" + e.getMessage() + "\n" +
-                stackTrace,
+                "See the console output for more detailed error information!",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             System.exit(3);
