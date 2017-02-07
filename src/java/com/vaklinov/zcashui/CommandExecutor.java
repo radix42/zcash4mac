@@ -50,9 +50,13 @@ public class CommandExecutor
 		this.args = args;
 	}		
 	
-	public Process executeNoResult() throws IOException {
+	
+	public Process startChildProcess() 
+		throws IOException 
+	{
 	    return Runtime.getRuntime().exec(args);
 	}
+	
 	
 	public String execute()
 		throws IOException, InterruptedException

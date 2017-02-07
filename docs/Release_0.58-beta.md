@@ -1,9 +1,10 @@
-# [ZCash](https://z.cash/) Desktop GUI Wallet - binary release v0.25-beta
+# [ZCash](https://z.cash/) Desktop GUI Wallet - binary release v0.58-beta
 
-This document describes how to install binary release v0.25-beta of the [ZCash](https://z.cash/) 
+This document describes how to install binary release v0.58-beta of the [ZCash](https://z.cash/) 
 Desktop GUI Wallet. This release of the ZCash Desktop GUI Wallet is tested with ZCash version 
-[v1.0.0-rc1](https://github.com/zcash/zcash/releases/tag/v1.0.0-rc1). 
-It is intended to be used in the ZCash test network only - not in production!
+[v1.0.5](https://github.com/zcash/zcash/releases/tag/v1.0.5). Users who encounter issues 
+not listed in the list of known issues and limitations, are welcome to report them in 
+the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues). 
 
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWalletSmall.png "Main Window")
 
@@ -11,8 +12,11 @@ It is intended to be used in the ZCash test network only - not in production!
 
 1. Downloading the wallet
  
-   Download file [ZCashSwingWalletUI.jar](https://github.com/vaklinov/zcash-swing-wallet-ui/releases/download/v0.25-beta/ZCashSwingWalletUI.jar)
-   and place it in a folder like `~/Downloads`.
+   Download file [ZCashSwingWalletUI.jar](https://github.com/vaklinov/zcash-swing-wallet-ui/releases/download/0.58-beta/ZCashSwingWalletUI.jar)
+   and place it in a folder like `~/Downloads`. Then please make the JAR executable with a command like:
+   ```
+   user@ubuntu:~/Downloads$ chmod u+x ./ZCashSwingWalletUI.jar
+   ```
    
 2. Verifying the download
 
@@ -20,9 +24,9 @@ It is intended to be used in the ZCash test network only - not in production!
    need to compute its SHA256 checksum, like this:
    ```
    user@ubuntu:~/Downloads$ sha256sum ZCashSwingWalletUI.jar 
-   5042002b1ac2ceabdce04fc2a2a2534315c4ad59f85e7efa7349ad20ec3519ad  ZCashSwingWalletUI.jar
+   e6b877d0811190f398b6465580ec640808b1ea719a2e7f5838658a938153f72f  ZCashSwingWalletUI.jar
    ```
-   **If the resulting checksum is not `5042002b1ac2ceabdce04fc2a2a2534315c4ad59f85e7efa7349ad20ec3519ad` then**
+   **If the resulting checksum is not `e6b877d0811190f398b6465580ec640808b1ea719a2e7f5838658a938153f72f` then**
    **something is wrong and you should discard the downloaded wallet!**
 
 3. Installing the downloaded ZCash GUI wallet
@@ -30,8 +34,8 @@ It is intended to be used in the ZCash test network only - not in production!
   3.1. If you have built ZCash from source code:
 
    Assuming you have already built from source code [ZCash](https://z.cash/) in directory `/home/user/zcash/src` (for 
-   example - this is the typical build dir. for ZCash v1.0.0-rc1) which contains the command line tools `zcash-cli` 
-   and `zcashd` you need to take the downloaded file `ZCashSwingWalletUI.jar` and copy it 
+   example - this is the typical build dir. for ZCash v1.0.5) which contains the command line tools `zcash-cli` 
+   and `zcashd` you need to take the file `ZCashSwingWalletUI.jar` and copy it 
    to diretcory `/home/user/zcash/src` (the same dir. that contains `zcash-cli` and `zcashd`). Example copy command:
    ```
    user@ubuntu:~/Downloads$ cp ./ZCashSwingWalletUI.jar /home/user/zcash/src    
@@ -54,19 +58,28 @@ It is intended to be used in the ZCash test network only - not in production!
    Assuming you have already installed [ZCash](https://z.cash/) and the GUI Wallet `ZCashSwingWalletUI.jar` in 
    directory `/home/user/zcash/src` one way to run it from command line is:
    ```
-   user@ubuntu:~/Downloads$ java -jar /home/user/zcash/src/ZCashSwingWalletUI.jar
+   user@ubuntu:~$ java -jar /home/user/zcash/src/ZCashSwingWalletUI.jar
    ```
    If you are using Ubuntu (or similar ;) Linux you may instead just use the file manager and 
    right-click on the `ZCashSwingWalletUI.jar` file and choose the option "Open with OpenJDK 8 Runtime". 
    This will start the ZCash GUI wallet.
 
-
+### Donations accepted
+At the present time this project is non-commercial in nature and developed by volunteers. If you find the GUI
+Wallet useful, please consider making a donation for its further development. Your contribution matters! Donations 
+are accepted at ZCash address:
+```
+t1UMGjLDipdfuCdNwxUZTV4FhM34FJXgM8r
+```
 
 ### License
 This program is distributed under an [MIT License](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/LICENSE).
 
 ### Disclaimer
 This program is not officially endorsed by or associated with the ZCash project and the ZCash company.
+[ZCash®](https://trademarks.justia.com/871/93/zcash-87193130.html) and the 
+[ZCash® logo](https://trademarks.justia.com/868/84/z-86884549.html) are trademarks of the
+[Zerocoin Electric Coin Company](https://trademarks.justia.com/owners/zerocoin-electric-coin-company-3232749/).
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -78,13 +91,15 @@ SOFTWARE.
 
 ### Known issues and limitations
 
+1. Limitation: Wallet encryption has been temporarily disabled in ZCash due to stability problems. A corresponding issue 
+[#1552](https://github.com/zcash/zcash/issues/1552) has been opened by the ZCash developers. Correspondingly
+wallet encryption has been temporarily disabled in the ZCash Desktop GUI Wallet.
 1. Issue: the GUI wallet does not work correctly if zcashd is started with a custom data directory, like:
 `zcashd -datadir=/home/data/whatever` This will be fixed in later versions.
 1. Issue: GUI data tables (transactions/addresses etc.) allow copying of data via double click but also allow editing. 
 The latter needs to be disabled. 
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address 
-transactions). This will be addressed when it becomes possible to do so via the ZCash command line tools 
-(`zcash-cli`). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 
-for the ZCash developers. 
+transactions). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 
+for the ZCash developers - soon to be fixed. A fix for the GUI wallet may be expected within 1-2 weeks. 
 1. Limitation: The CPU percentage shown to be taken by zcashd is the average for the entire lifetime of the process. 
 This is not very useful. This will be improved in future versions.

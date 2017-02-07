@@ -65,6 +65,8 @@ public class WalletOperations
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller         clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
+	
+	AddressBookDialog addressBookDialog = null;
 
 
 	public WalletOperations(ZCashUI parent,
@@ -162,9 +164,12 @@ public class WalletOperations
 	{
 		try
 		{
+			this.issueBackupDirectoryWarning();
+			
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setDialogTitle("Backup wallet to file...");
-			fileChooser.setFileFilter(new FileNameExtensionFilter("wallets (*.dat)", "dat"));
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			fileChooser.setCurrentDirectory(OSUtil.getUserHomeDirectory());
 			 
 			int result = fileChooser.showSaveDialog(this.parent);
 			 
@@ -180,7 +185,7 @@ public class WalletOperations
 			{
 				this.parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							
-				this.clientCaller.backupWallet(f.getCanonicalPath());
+				this.clientCaller.backupWallet(f.getName());
 				
 				this.parent.setCursor(oldCursor);
 			} catch (WalletCallException wce)
@@ -198,8 +203,8 @@ public class WalletOperations
 			
 			JOptionPane.showMessageDialog(
 				this.parent, 
-				"The wallet has been backed up successfully to location:\n" +
-				f.getCanonicalPath(),
+				"The wallet has been backed up successfully to file: " + f.getName() + "\n" +
+				"in the backup directory provided to zcashd (-exportdir=<dir>).",
 				"Wallet is backed up...", JOptionPane.INFORMATION_MESSAGE);
 			
 		} catch (Exception e)
@@ -215,9 +220,12 @@ public class WalletOperations
 		
 		try
 		{
+			this.issueBackupDirectoryWarning();
+			
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setDialogTitle("Export wallet private keys to file...");
-			fileChooser.setFileFilter(new FileNameExtensionFilter("Text files (*.txt)", "txt"));
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			fileChooser.setCurrentDirectory(OSUtil.getUserHomeDirectory());
 			 
 			int result = fileChooser.showSaveDialog(this.parent);
 			 
@@ -233,7 +241,7 @@ public class WalletOperations
 			{
 				this.parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							
-				this.clientCaller.exportWallet(f.getCanonicalPath());
+				this.clientCaller.exportWallet(f.getName());
 				
 				this.parent.setCursor(oldCursor);
 			} catch (WalletCallException wce)
@@ -251,8 +259,9 @@ public class WalletOperations
 			
 			JOptionPane.showMessageDialog(
 				this.parent, 
-				"The wallet private keys have been exported successfully to location:\n" +
-				f.getCanonicalPath() + "\n\n" +
+				"The wallet private keys have been exported successfully to file:\n" + 
+				f.getName() + "\n" +
+				"in the backup directory provided to zcashd (-exportdir=<dir>).\n" +
 				"You need to protect this file from unauthorized access. Anyone who\n" +
 				"has access to the private keys can spend the ZCash balance!",
 				"Wallet private key export...", JOptionPane.INFORMATION_MESSAGE);
@@ -286,7 +295,7 @@ public class WalletOperations
 		{
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setDialogTitle("Import wallet private keys from file...");
-			fileChooser.setFileFilter(new FileNameExtensionFilter("Text files (*.txt)", "txt"));
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			 
 			int result = fileChooser.showOpenDialog(this.parent);
 			 
@@ -402,16 +411,68 @@ public class WalletOperations
 		}
 	}
 	
+	
 	public void importSinglePrivateKey()
 	{
-	       try
-	       {
-	           SingleKeyImportDialog kd = new SingleKeyImportDialog(this.parent, this.clientCaller);
-	           kd.setVisible(true);
-	           
-	       } catch (Exception ex)
-	       {
-	           this.errorReporter.reportError(ex, false);
-	       }
-	   }
+		try
+		{
+			SingleKeyImportDialog kd = new SingleKeyImportDialog(this.parent, this.clientCaller);
+			kd.setVisible(true);
+			
+		} catch (Exception ex)
+		{
+			this.errorReporter.reportError(ex, false);
+		}
+	}
+	
+	
+	public void showAddressBook()
+	{
+		try
+		{
+			if ((this.addressBookDialog == null) ||
+				(!this.addressBookDialog.isDisplayable()))
+			{
+	   		    this.addressBookDialog = new AddressBookDialog(this.parent, this.sendCash, this.tabs);
+	   		    this.addressBookDialog.setVisible(true);
+			} else
+			{
+				this.addressBookDialog.toFront();
+			}
+		} catch (Exception ex)
+		{
+			this.errorReporter.reportError(ex, false);
+		}
+	}
+	
+	
+	private void issueBackupDirectoryWarning()
+		throws IOException
+	{
+        String userDir = OSUtil.getSettingsDirectory();
+        File warningFlagFile = new File(userDir + File.separator + "backupInfoShown.flag");
+        if (warningFlagFile.exists())
+        {
+            return;
+        } else
+        {
+            warningFlagFile.createNewFile();
+        }
+        
+        JOptionPane.showMessageDialog(
+            this.parent,
+            "For security reasons the wallet may be backed up/private keys exported only if\n" +
+            "the zcashd parameter -exportdir=<dir> has been set. If you started zcashd \n" +
+            "manually, you ought to have provided this parameter. When zcashd is started \n" +
+            "automatically by the GUI wallet the directory provided as parameter to -exportdir\n" +
+            "is the user home directory: " + OSUtil.getUserHomeDirectory().getCanonicalPath() +"\n" +
+            "Please navigate to the directory provided as -exportdir=<dir> and select a\n"+ 
+            "filename in it to backup/export private keys. If you select another directory\n" +
+            "instead, the destination file will still end up in the directory provided as \n" +
+            "-exportdir=<dir>. If this parameter was not provided to zcashd, the process\n" +
+            "will fail with a security check error. The filename needs to consist of only\n" + 
+            "alphanumeric characters (e.g. dot is not allowed).\n\n" +
+            "(This message will be shown only once)",
+            "Wallet backup directory information", JOptionPane.INFORMATION_MESSAGE);
+	}
 }

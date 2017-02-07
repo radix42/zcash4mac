@@ -1,3 +1,5 @@
+// Code was originally written by developer - https://github.com/zlatinb
+// Taken from repository https://github.com/zlatinb/zcash-swing-wallet-ui under an MIT licemse
 package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
@@ -44,8 +46,6 @@ import javax.swing.table.TableColumn;
 
 public class AddressBookPanel extends JPanel {
     
-    private static final Logger LOG = Logger.getLogger(AddressBookPanel.class.getName());
-
     private static class AddressBookEntry {
         final String name,address;
         AddressBookEntry(String name, String address) {
@@ -136,11 +136,11 @@ public class AddressBookPanel extends JPanel {
             }
         }
         
-        LOG.info("loaded "+entries.size()+" address book entries");
+        System.out.println("loaded "+entries.size()+" address book entries");
     }
     
     private void saveEntriesToDisk() {
-        LOG.info("Saving "+entries.size()+" addresses");
+    	System.out.println("Saving "+entries.size()+" addresses");
         try {
             File addressBookFile = new File(OSUtil.getSettingsDirectory(),"addressBook.csv");
             try (PrintWriter printWriter = new PrintWriter(new FileWriter(addressBookFile))) {
@@ -148,7 +148,9 @@ public class AddressBookPanel extends JPanel {
                     printWriter.println(entry.address+","+entry.name);
             }
         } catch (IOException bad) {
-            LOG.log(Level.WARNING,"Saving Address Book Failed!!!!",bad);
+        	// TODO: report error to the user!
+        	bad.printStackTrace();
+        	System.out.println("Saving Address Book Failed!!!!");
         }
     }
     
@@ -208,10 +210,13 @@ public class AddressBookPanel extends JPanel {
             if (address == null || "".equals(address))
                 return; // cancelled
             entries.add(new AddressBookEntry(name,address));
-            table.invalidate();
-            table.repaint();
+            
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+                    table.invalidate();
+                    table.revalidate();
+                    table.repaint();
+                	
                     saveEntriesToDisk();
                 }
             });

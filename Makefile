@@ -1,7 +1,7 @@
 .PHONY: default
-default: macapp ;
+default: winapp ;
 
-APPNAME=zcash4mac
+APPNAME=zcash4win
 APPBUNDLE=build/osxapp/zcash4mac.app
 APPBUNDLECONTENTS=$(APPBUNDLE)/Contents
 APPBUNDLEEXE=$(APPBUNDLECONTENTS)/MacOS
@@ -13,7 +13,7 @@ VERSION ?= $(SHORTVERSION)-$(BUILD)
 appbundle: zcash-bin
 	sed -i '.bak' 's/@version@/'"$(VERSION)"'/' src/build/build.xml
 	sed -i '.bak' 's/@shortversion@/'"$(SHORTVERSION)"'/; s/@build@/'"$(BUILD)"'/' package/macosx/Info.plist
-	ant -f src/build/build.xml osxbundle
+	ant -f src/build/build.xml wininst
 	mv src/build/build.xml.bak src/build/build.xml
 	mv package/macosx/Info.plist.bak package/macosx/Info.plist
 #	mkdir -p $(APPBUNDLE)/Contents/Frameworks

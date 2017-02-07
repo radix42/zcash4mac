@@ -36,6 +36,8 @@ import java.io.StringReader;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
+import com.vaklinov.zcashui.OSUtil.OS_TYPE;
+
 
 /**
  * Observes the daemon - running etc.
@@ -77,14 +79,13 @@ public class ZCashInstallationObserver
 			    "a directory or is otherwise inaccessible to the wallet!");
 		}
 
-		// TODO: names will change on Windows
-		File zcashd = new File(dir, "zcashd");
-		File zcashcli = new File(dir, "zcash-cli");
+		File zcashd = new File(dir, OSUtil.getZCashd());
+		File zcashcli = new File(dir, OSUtil.getZCashCli());
 
 		if ((!zcashd.exists()) || (!zcashcli.exists()))
 		{
-			zcashd = OSUtil.findZCashCommand("zcashd");
-			zcashcli = OSUtil.findZCashCommand("zcash-cli");
+			zcashd = OSUtil.findZCashCommand(OSUtil.getZCashd());
+			zcashcli = OSUtil.findZCashCommand(OSUtil.getZCashCli());
 		}
 
 		LOG.info("Using ZCash utilities: " +
@@ -96,15 +97,31 @@ public class ZCashInstallationObserver
 			throw new InstallationDetectionException(
 				"The ZCash GUI Wallet installation directory " + installDir + " needs\nto contain " +
 				"the command line utilities zcashd and zcash-cli. At least one of them is missing! \n" +
-				"Please place files "+ZCashUI.NAME+".jar, zcash-cli, zcashd in the same directory.");
+				"Please place files ZCashSwingWalletUI.jar, " + OSUtil.getZCashCli() + ", " + 
+				OSUtil.getZCashd() + " in the same directory.");
 		}
 	}
 
-
+	
 	public synchronized DaemonInfo getDaemonInfo()
+			throws IOException, InterruptedException
+	{
+		OS_TYPE os = OSUtil.getOSType();
+		
+		if (os == OS_TYPE.WINDOWS)
+		{
+			return getDaemonInfoForWindowsOS();
+		} else
+		{
+			return getDaemonInfoForUNIXLikeOS();
+		}
+	}
+	
+
+	// So far tested on Mac OS X and Linux - expected to work on other UNIXes as well
+	private synchronized DaemonInfo getDaemonInfoForUNIXLikeOS()
 		throws IOException, InterruptedException
 	{
-		// TODO: OS Specific
 		DaemonInfo info = new DaemonInfo();
 		info.status = DAEMON_STATUS.UNABLE_TO_ASCERTAIN;
 
@@ -171,7 +188,85 @@ public class ZCashInstallationObserver
 
 		return info;
 	}
+	
+	
+	private synchronized DaemonInfo getDaemonInfoForWindowsOS()
+		throws IOException, InterruptedException
+	{
+		DaemonInfo info = new DaemonInfo();
+		info.status = DAEMON_STATUS.UNABLE_TO_ASCERTAIN;
+		info.cpuPercentage = 0;
+		info.virtualSizeMB = 0;
 
+		CommandExecutor exec = new CommandExecutor(new String[] { "tasklist" });
+		LineNumberReader lnr = new LineNumberReader(new StringReader(exec.execute()));
+
+		String line;
+		while ((line = lnr.readLine()) != null)
+		{
+			StringTokenizer st = new StringTokenizer(line, " \t", false);
+			boolean foundZCash = false;
+			for (int i = 0; i < 5; i++)
+			{
+				String token = null;
+				if (st.hasMoreTokens())
+				{
+					token = st.nextToken();
+				} else
+				{
+					break;
+				}
+				
+				if (token.startsWith("\""))
+				{
+					token = token.substring(1);
+				}
+				
+				if (token.endsWith("\""))
+				{
+					token = token.substring(0, token.length() - 1);
+				}
+
+				if (i == 0)
+				{
+					if (token.equals("zcashd.exe") || token.equals("zcashd"))
+					{
+						info.status = DAEMON_STATUS.RUNNING;
+						foundZCash = true;
+						//System.out.println("ZCashd process data is: " + line);
+					}
+				} else if ((i == 4) && foundZCash)
+				{
+					try
+					{
+						String size = token;
+						size = size.replaceAll(",", "");
+						if (size.endsWith(" K"))
+						{
+							size = size.substring(0, size.length() - 2);
+						}
+						
+					    info.residentSizeMB = Double.valueOf(size) / 1000;
+					} catch (NumberFormatException nfe) { /* TODO: Log or handle exception */ };
+				} 
+			}
+
+			if (foundZCash)
+			{
+				break;
+			}
+		}
+
+		if (info.status != DAEMON_STATUS.RUNNING)
+		{
+			info.cpuPercentage  = 0;
+			info.residentSizeMB = 0;
+			info.virtualSizeMB  = 0;
+		}
+
+		return info;
+	}
+	
 
 	public static class InstallationDetectionException
 		extends IOException

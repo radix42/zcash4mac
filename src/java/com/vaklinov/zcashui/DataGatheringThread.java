@@ -140,23 +140,34 @@ public class DataGatheringThread<T>
 			this.doOneGathering();
 		}
 		
+		mainLoop:
 		while (true)
 		{
 			synchronized (this) 
 			{
-				try
+				long startWait = System.currentTimeMillis();
+				long endWait = startWait;
+				do
 				{
-					this.wait(this.interval);
-				} catch (InterruptedException ie)
-				{
-					// One of the rare cases where we do nothing
-				    LOG.log(Level.WARNING, "interrupted", ie);
-				}
+					try
+					{
+						this.wait(300);
+					} catch (InterruptedException ie)
+					{
+						// One of the rare cases where we do nothing
+						ie.printStackTrace();
+					}
+					
+					endWait = System.currentTimeMillis();
+				} while ((endWait - startWait) <= this.interval);
 			}
 			
 			if (!this.suspended)
 			{
 				this.doOneGathering();
+			} else
+			{
+				break mainLoop;
 			}
 		}
 	} // End public void run()
@@ -173,10 +184,16 @@ public class DataGatheringThread<T>
 			localData = this.gatherer.gatherData();
 		} catch (Exception e)
 		{
-			LOG.log(Level.WARNING, "", e);
-			if (this.errorReporter != null)
+			if (!this.suspended)
 			{
-				this.errorReporter.reportError(e);
+				e.printStackTrace();
+				if (this.errorReporter != null)
+				{
+					this.errorReporter.reportError(e);
+				}
+			} else
+			{
+				System.out.println("DataGatheringThread: ignoring " + e.getClass().getName() + " due to suspension!");
 			}
 		}
 		

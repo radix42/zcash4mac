@@ -1,4 +1,4 @@
-# [ZCash](https://z.cash/) Desktop GUI Wallet - for Mac OS X
+# [ZCash](https://z.cash/)[®](#disclaimer) Desktop GUI Wallet - for Mac OS X
 
 ZCash for Mac OS is not yet officially supported. Thanks to [@radix42](https://github.com/radix42) an experimental build has been provided.
 Before installing the GUI wallet on Mac OS you need to [install ZCash on Mac OS](https://github.com/radix42/zcash/wiki/Mac-User-Guide).
@@ -60,7 +60,7 @@ At the present time this project is non-commercial in nature and developed by vo
 Wallet useful, please consider making a donation for its further development. Your contribution matters! Donations 
 are accepted at ZCash T address:
 ```
-t1VAggo7RusLVBzHSeYbGkxDQQhLZyigxty
+t1UMGjLDipdfuCdNwxUZTV4FhM34FJXgM8r
 ```
 
 ### License
@@ -68,6 +68,9 @@ This program is distributed under an [MIT License](https://github.com/vaklinov/z
 
 ### Disclaimer
 This program is not officially endorsed by or associated with the ZCash project and the ZCash company.
+[ZCash®](https://trademarks.justia.com/871/93/zcash-87193130.html) and the 
+[ZCash® logo](https://trademarks.justia.com/868/84/z-86884549.html) are trademarks of the
+[Zerocoin Electric Coin Company](https://trademarks.justia.com/owners/zerocoin-electric-coin-company-3232749/).
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -88,6 +91,7 @@ wallet encryption has been temporarily disabled in the ZCash Desktop GUI Wallet.
 The latter needs to be disabled. 
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address 
 transactions). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 
-for the ZCash developers - soon to be fixed. A fix for the GUI wallet may be expected within 1-2 weeks. 
-1. Limitation: The CPU percentage shown to be taken by zcashd is the average for the entire lifetime of the process. 
-This is not very useful. This will be improved in future versions.
+for the ZCash developers. 
+1. Limitation: The CPU percentage shown to be taken by zcashd on Linux is the average for the entire lifetime 
+of the process. This is not very useful. This will be improved in future versions.
+

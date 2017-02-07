@@ -50,6 +50,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.ParseException;
 import com.eclipsesource.json.WriterConfig;
+import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 
 
 /**
@@ -96,7 +97,7 @@ public class ZCashClientCaller
 
 
 	// ZCash client program and daemon
-	private File zcashcli,zcashd;
+	private File zcashcli, zcashd;
 
 
 	public ZCashClientCaller(String installDir)
@@ -104,11 +105,11 @@ public class ZCashClientCaller
 	{
 		// Detect daemon and client tools installation
 		File dir = new File(installDir);
-	    zcashcli = new File(dir, "zcash-cli");
+	    zcashcli = new File(dir, OSUtil.getZCashCli());
 
 		if (!zcashcli.exists())
 		{
-			zcashcli = OSUtil.findZCashCommand("zcash-cli");
+			zcashcli = OSUtil.findZCashCommand(OSUtil.getZCashCli());
 		}
 
 		if ((zcashcli == null) || (!zcashcli.exists()))
@@ -118,39 +119,75 @@ public class ZCashClientCaller
 				"the command line utilities zcashd and zcash-cli. zcash-cli is missing!");
 		}
 		
-		zcashd = new File(dir, "zcashd");
+		zcashd = new File(dir, OSUtil.getZCashd());
 		if (!zcashd.exists())
-		    zcashd = OSUtil.findZCashCommand("zcashd");
+		{
+		    zcashd = OSUtil.findZCashCommand(OSUtil.getZCashd());
+		}
+		
 		if (zcashd == null || (!zcashd.exists()))
-		    throw new IOException("zcash-cli exists but zcashd doesn't?  Check your installation!");
+		{
+		    throw new IOException(
+		    	"The ZCash command line utility " + zcashcli.getCanonicalPath() + 
+		    	" was found, but zcashd.exe was not found!");
+		}
 	}
 
-	public synchronized Process startDaemon() throws IOException,InterruptedException {
+	
+	public synchronized Process startDaemon() 
+		throws IOException, InterruptedException 
+	{
+		String exportDir = OSUtil.getUserHomeDirectory().getCanonicalPath();
+		
 	    CommandExecutor starter = new CommandExecutor(
-	            new String[] { zcashd.getCanonicalPath()});
-	    return starter.executeNoResult();
+	        new String[] 
+	        {
+	        	zcashd.getCanonicalPath(), 
+	        	"-exportdir=" + exportDir
+	        });
+	    
+	    return starter.startChildProcess();
 	}
 	
-	public synchronized void stopDaemon() throws IOException,InterruptedException {
+	
+	public /*synchronized*/ void stopDaemon() 
+		throws IOException,InterruptedException 
+	{
 	    CommandExecutor stopper = new CommandExecutor(
-	            new String[] {zcashcli.getCanonicalPath(),"stop"});
-	    stopper.executeNoResult().waitFor();
+	            new String[] { zcashcli.getCanonicalPath(), "stop" });
+	    
+	    String result = stopper.execute();
+	    System.out.println("Stop command issued: " + result);
 	}
 	
-	public synchronized JsonObject getInfo() throws IOException,InterruptedException,WalletCallException {
+
+	public synchronized JsonObject getDaemonRawRuntimeInfo() 
+		throws IOException, InterruptedException, WalletCallException 
+	{
 	    CommandExecutor infoGetter = new CommandExecutor(
-	            new String[] { zcashcli.getCanonicalPath(),"getinfo"});
+	            new String[] { zcashcli.getCanonicalPath(), "getinfo"} );
 	    String info = infoGetter.execute();
+	    
+	    if (info.trim().equals("error: couldn't connect to server"))
+	    {
+	    	throw new IOException(info.trim());
+	    }
+	    
 	    if (info.startsWith("error: "))
+	    {
 	        info = info.substring(7);
-	    try {
+	    }
+	    
+	    try 
+	    {
 	        return Json.parse(info).asObject();
-	    } catch (ParseException pe){
-	        LOG.log(Level.WARNING, "getInfo failed", pe);
+	    } catch (ParseException pe)
+	    {
 	        throw new IOException(pe);
 	    }
 	}
 
+	
 	public synchronized WalletBalance getWalletInfo()
 		throws WalletCallException, IOException, InterruptedException
 	{
@@ -175,7 +212,16 @@ public class ZCashClientCaller
 	public synchronized String[][] getWalletPublicTransactions()
 		throws WalletCallException, IOException, InterruptedException
 	{
-	    JsonArray jsonTransactions = executeCommandAndGetJsonArray("listtransactions", "", "100");
+		String notListed = "\u26D4";
+		
+		OS_TYPE os = OSUtil.getOSType();
+		if (os == OS_TYPE.WINDOWS)
+		{
+			notListed = " \u25B6";
+		}
+		
+	    JsonArray jsonTransactions = executeCommandAndGetJsonArray(
+	    	"listtransactions", wrapStringParameter(""), "100");
 	    String strTransactions[][] = new String[jsonTransactions.size()][];
 	    for (int i = 0; i < jsonTransactions.size(); i++)
 	    {
@@ -189,7 +235,7 @@ public class ZCashClientCaller
 	    	strTransactions[i][2] = trans.get("confirmations").toString();
 	    	strTransactions[i][3] = trans.get("amount").toString();
 	    	strTransactions[i][4] = trans.get("time").toString();
-	    	strTransactions[i][5] = trans.getString("address", "\u26D4 (Z Address not listed by wallet!)");
+	    	strTransactions[i][5] = trans.getString("address", notListed + " (Z Address not listed by wallet!)");
 	    	strTransactions[i][6] = trans.get("txid").toString();
 
 	    }
@@ -221,7 +267,8 @@ public class ZCashClientCaller
 
 		for (String zAddress : zAddresses)
 		{
-		    JsonArray jsonTransactions = executeCommandAndGetJsonArray("z_listreceivedbyaddress", zAddress, "0");
+		    JsonArray jsonTransactions = executeCommandAndGetJsonArray(
+		    	"z_listreceivedbyaddress", wrapStringParameter(zAddress), "0");
 		    for (int i = 0; i < jsonTransactions.size(); i++)
 		    {
 		    	String[] currentTransaction = new String[7];
@@ -283,7 +330,8 @@ public class ZCashClientCaller
 	public synchronized Map<String, String> getRawTransactionDetails(String txID)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject("gettransaction", txID);
+		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject(
+			"gettransaction", wrapStringParameter(txID));
 
 		Map<String, String> map = new HashMap<String, String>();
 
@@ -299,7 +347,8 @@ public class ZCashClientCaller
 	public synchronized String getRawTransaction(String txID)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject("gettransaction", txID);
+		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject(
+			"gettransaction", wrapStringParameter(txID));
 
 		return jsonTransaction.toString(WriterConfig.PRETTY_PRINT);
 	}
@@ -309,7 +358,8 @@ public class ZCashClientCaller
 	public synchronized String getWalletTransactionTime(String txID)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject("gettransaction", txID);
+		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject(
+			"gettransaction", wrapStringParameter(txID));
 
 		return String.valueOf(jsonTransaction.getLong("time", -1));
 	}
@@ -318,7 +368,8 @@ public class ZCashClientCaller
 	public synchronized String getWalletTransactionConfirmations(String txID)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject("gettransaction", txID);
+		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject(
+			"gettransaction", wrapStringParameter(txID));
 
 		return jsonTransaction.get("confirmations").toString();
 	}
@@ -328,7 +379,7 @@ public class ZCashClientCaller
 	public synchronized String getBalanceForAddress(String address)
 		throws WalletCallException, IOException, InterruptedException
 	{
-	    JsonValue response = this.executeCommandAndGetJsonValue("z_getbalance", address);
+	    JsonValue response = this.executeCommandAndGetJsonValue("z_getbalance", wrapStringParameter(address));
 
 		return String.valueOf(response.toString());
 	}
@@ -337,7 +388,7 @@ public class ZCashClientCaller
 	public synchronized String getUnconfirmedBalanceForAddress(String address)
 		throws WalletCallException, IOException, InterruptedException
 	{
-	    JsonValue response = this.executeCommandAndGetJsonValue("z_getbalance", address, "0");
+	    JsonValue response = this.executeCommandAndGetJsonValue("z_getbalance", wrapStringParameter(address), "0");
 
 		return String.valueOf(response.toString());
 	}
@@ -353,7 +404,7 @@ public class ZCashClientCaller
 
 
 	// Returns OPID
-	public synchronized String sendCash(String from, String to, String amount, String memo)
+	public synchronized String sendCash(String from, String to, String amount, String memo, String transactionFee)
 		throws WalletCallException, IOException, InterruptedException
 	{
 		StringBuilder hexMemo = new StringBuilder();
@@ -393,14 +444,29 @@ public class ZCashClientCaller
 		}
 
 		DecimalFormatSymbols decSymbols = new DecimalFormatSymbols(Locale.ROOT);
+		
+		// Properly format teh transaction fee as a number
+		if ((transactionFee == null) || (transactionFee.trim().length() <= 0))
+		{
+			transactionFee = "0.0001"; // Default value
+		} else
+		{
+			transactionFee = new DecimalFormat(
+				"########0.00######", decSymbols).format(Double.valueOf(transactionFee));
+		}
+		
 		String[] sendCashParameters = new String[]
 	    {
-		    this.zcashcli.getCanonicalPath(), "z_sendmany", from,
+		    this.zcashcli.getCanonicalPath(), "z_sendmany", wrapStringParameter(from),
 		    // This replacement is a hack to make sure the JSON object amount has double format 0.00 etc.
 		    // TODO: find a better way to format the amount
-		    toMany.toString().replace(
+		    wrapStringParameter(toMany.toString().replace(
 		    	amountPattern,
-		    	"\"amount\":" + new DecimalFormat("########0.00######", decSymbols).format(Double.valueOf(amount)))
+		    	"\"amount\":" + new DecimalFormat("########0.00######", decSymbols).format(Double.valueOf(amount)))),
+		    // Default min confirmations for the input transactions is 1
+		    "1",
+		    // transaction fee
+		    transactionFee
 		};
 
 	    CommandExecutor caller = new CommandExecutor(sendCashParameters);
@@ -413,17 +479,19 @@ public class ZCashClientCaller
 
 		LOG.info("Sending cash with the following command: " +
                 sendCashParameters[0] + " " + sendCashParameters[1] + " " +
-                sendCashParameters[2] + " " + sendCashParameters[3] + "." +
+                sendCashParameters[2] + " " + sendCashParameters[3] + " " +
+                sendCashParameters[4] + " " + sendCashParameters[5] + "." +
                 " Got result: [" + strResponse + "]");
 
 		return strResponse.trim();
 	}
 
 
-	public boolean isSendingOperationComplete(String opID)
+	public synchronized boolean isSendingOperationComplete(String opID)
 	    throws WalletCallException, IOException, InterruptedException
 	{
-		JsonArray response = this.executeCommandAndGetJsonArray("z_getoperationstatus", "[\"" + opID + "\"]");
+		JsonArray response = this.executeCommandAndGetJsonArray(
+			"z_getoperationstatus", wrapStringParameter("[\"" + opID + "\"]"));
 		JsonObject jsonStatus = response.get(0).asObject();
 
 		String status = jsonStatus.getString("status", "ERROR");
@@ -445,10 +513,11 @@ public class ZCashClientCaller
 	}
 
 
-	public boolean isCompletedOperationSuccessful(String opID)
+	public synchronized boolean isCompletedOperationSuccessful(String opID)
 	    throws WalletCallException, IOException, InterruptedException
 	{
-		JsonArray response = this.executeCommandAndGetJsonArray("z_getoperationstatus", "[\"" + opID + "\"]");
+		JsonArray response = this.executeCommandAndGetJsonArray(
+			"z_getoperationstatus", wrapStringParameter("[\"" + opID + "\"]"));
 		JsonObject jsonStatus = response.get(0).asObject();
 
 		String status = jsonStatus.getString("status", "ERROR");
@@ -469,10 +538,11 @@ public class ZCashClientCaller
 
 
 	// May only be called for already failed operations
-	public String getOperationFinalErrorMessage(String opID)
+	public synchronized String getOperationFinalErrorMessage(String opID)
 	    throws WalletCallException, IOException, InterruptedException
 	{
-		JsonArray response = this.executeCommandAndGetJsonArray("z_getoperationstatus", "[\"" + opID + "\"]");
+		JsonArray response = this.executeCommandAndGetJsonArray(
+			"z_getoperationstatus", wrapStringParameter("[\"" + opID + "\"]"));
 		JsonObject jsonStatus = response.get(0).asObject();
 
 		JsonObject jsonError = jsonStatus.get("error").asObject();
@@ -480,7 +550,7 @@ public class ZCashClientCaller
 	}
 
 
-	public NetworkAndBlockchainInfo getNetworkAndBlockchainInfo()
+	public synchronized NetworkAndBlockchainInfo getNetworkAndBlockchainInfo()
 		throws WalletCallException, IOException, InterruptedException
 	{
 		NetworkAndBlockchainInfo info = new NetworkAndBlockchainInfo();
@@ -490,14 +560,14 @@ public class ZCashClientCaller
 
 		String strBlockCount = this.executeCommandAndGetSingleStringResponse("getblockcount");
 		String lastBlockHash = this.executeCommandAndGetSingleStringResponse("getblockhash", strBlockCount.trim());
-		JsonObject lastBlock = this.executeCommandAndGetJsonObject("getblock", lastBlockHash.trim());
+		JsonObject lastBlock = this.executeCommandAndGetJsonObject("getblock", wrapStringParameter(lastBlockHash.trim()));
 		info.lastBlockDate = new Date(Long.valueOf(lastBlock.getLong("time", -1) * 1000L));
 
 		return info;
 	}
 
 
-	public void lockWallet()
+	public synchronized void lockWallet()
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String response = this.executeCommandAndGetSingleStringResponse("walletlock");
@@ -512,11 +582,11 @@ public class ZCashClientCaller
 
 	// Unlocks the wallet for 5 minutes - meant to be followed shortly by lock!
 	// TODO: tests with a password containing spaces
-	public void unlockWallet(String password)
+	public synchronized void unlockWallet(String password)
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String response = this.executeCommandAndGetSingleStringResponse(
-			"walletpassphrase", password, "300");
+			"walletpassphrase", wrapStringParameter(password), "300");
 
 		// Response is expected to be empty
 		if (response.trim().length() > 0)
@@ -529,7 +599,7 @@ public class ZCashClientCaller
     // Wallet locks check - an unencrypted wallet will give an error
 	// zcash-cli walletlock
 	// error: {"code":-15,"message":"Error: running with an unencrypted wallet, but walletlock was called."}
-	public boolean isWalletEncrypted()
+	public synchronized boolean isWalletEncrypted()
    		throws WalletCallException, IOException, InterruptedException
     {
 		String[] params = new String[] { this.zcashcli.getCanonicalPath(), "walletlock" };
@@ -582,57 +652,118 @@ public class ZCashClientCaller
 	 *
 	 * @param password
 	 */
-	public void encryptWallet(String password)
+	public synchronized void encryptWallet(String password)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String response = this.executeCommandAndGetSingleStringResponse("encryptwallet", password);
-		LOG.info("Result of wallet encryption is: \n" + response);
+		String response = this.executeCommandAndGetSingleStringResponse(
+			"encryptwallet", wrapStringParameter(password));
+		System.out.println("Result of wallet encryption is: \n" + response);
 		// If no exception - obviously successful
 	}
 	
 	
-	public void backupWallet(String fileName)
+	public synchronized void backupWallet(String fileName)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		LOG.info("Backup up wallet to location: " + fileName);
-		String response = this.executeCommandAndGetSingleStringResponse("backupwallet", fileName);
+		System.out.println("Backup up wallet to location: " + fileName);
+		String response = this.executeCommandAndGetSingleStringResponse(
+			"backupwallet", wrapStringParameter(fileName));
 		// If no exception - obviously successful		
 	}
 	
 	
-	public void exportWallet(String fileName)
+	public synchronized void exportWallet(String fileName)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		LOG.info("Export wallet keys to location: " + fileName);
-		String response = this.executeCommandAndGetSingleStringResponse("z_exportwallet", fileName);
+		System.out.println("Export wallet keys to location: " + fileName);
+		String response = this.executeCommandAndGetSingleStringResponse(
+			"z_exportwallet", wrapStringParameter(fileName));
 		// If no exception - obviously successful		
 	}
 	
 	
-	public void importWallet(String fileName)
+	public synchronized void importWallet(String fileName)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		LOG.info("Import wallet keys from location: " + fileName);
-		String response = this.executeCommandAndGetSingleStringResponse("z_importwallet", fileName);
+		System.out.println("Import wallet keys from location: " + fileName);
+		String response = this.executeCommandAndGetSingleStringResponse(
+			"z_importwallet", wrapStringParameter(fileName));
 		// If no exception - obviously successful		
 	}
 	
 	
-	public String getTPrivateKey(String address)
+	public synchronized String getTPrivateKey(String address)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String response = this.executeCommandAndGetSingleStringResponse("dumpprivkey", address);
+		String response = this.executeCommandAndGetSingleStringResponse(
+			"dumpprivkey", wrapStringParameter(address));
 		
 		return response.trim();
 	}
 	
 	
-	public String getZPrivateKey(String address)
+	public synchronized String getZPrivateKey(String address)
 	    throws WalletCallException, IOException, InterruptedException
 	{
-		String response = this.executeCommandAndGetSingleStringResponse("z_exportkey", address);
+		String response = this.executeCommandAndGetSingleStringResponse(
+			"z_exportkey", wrapStringParameter(address));
 		
 		return response.trim();
+	}
+	
+	
+	// Imports a private key - tries both possibilities T/Z
+	public synchronized void importPrivateKey(String key)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		// First try a Z key
+		String[] params = new String[] { this.zcashcli.getCanonicalPath(), "z_importkey", wrapStringParameter(key) };
+		CommandExecutor caller = new CommandExecutor(params);
+    	String strResult = caller.execute();
+		
+		if ((strResult == null) || (strResult.trim().length() <= 0))
+		{
+			return;
+		}
+		
+		// Obviously we have an error trying to import a Z key
+		if (strResult.trim().toLowerCase().startsWith("error:"))
+		{
+   		 	 // Expecting an error of a T address key
+   		 	 String jsonPart = strResult.substring(strResult.indexOf("{"));
+  		     JsonValue response = null;
+  			 try
+  			 {
+  			   	response = Json.parse(jsonPart);
+  		 	 } catch (ParseException pe)
+  			 {
+  			   	 throw new WalletCallException(jsonPart + "\n" + pe.getMessage() + "\n", pe);
+  			 }
+
+  			 JsonObject respObject = response.asObject();
+  			 if ((respObject.getDouble("code", +123) == -1) &&
+  				 (respObject.getString("message", "ERR").indexOf("wrong network type") != -1))
+  			 {
+  				 // Obviously T address - do nothing here
+  			 } else
+  			 {
+  	    		 throw new WalletCallException("Unexpected response from wallet: " + strResult);
+  			 }
+		} else
+		{
+			throw new WalletCallException("Unexpected response from wallet: " + strResult);
+		}
+		
+		// Second try a T key
+		strResult = this.executeCommandAndGetSingleStringResponse("importprivkey", wrapStringParameter(key));
+		
+		if ((strResult == null) || (strResult.trim().length() <= 0))
+		{
+			return;
+		}
+		
+		// Obviously an error
+		throw new WalletCallException("Unexpected response from wallet: " + strResult);
 	}
 	
 
@@ -737,6 +868,21 @@ public class ZCashClientCaller
 		}
 
 		return strResponse;
+	}
+	
+	
+	// Used to wrap string parameters on the command line - not doing so causes problems on Windows.
+	private String wrapStringParameter(String param)
+	{
+		OS_TYPE os = OSUtil.getOSType();
+		
+		// Fix is made for Windows only
+		if (os == OS_TYPE.WINDOWS)
+		{
+			param = "\"" + param.replace("\"", "\\\"") + "\"";
+		}
+		
+		return param;
 	}
 	
 	

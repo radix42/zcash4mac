@@ -1,2 +1,0 @@
-JSON Parser code taken from:
-https://github.com/ralfstx/minimal-json

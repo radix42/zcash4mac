@@ -109,7 +109,7 @@ public class SingleKeyImportDialog
 		tempPanel.add(this.lowerLabel = new JLabel(
 			"<html><span style=\"font-weight:bold\">" + 
 		    "Warning:</span> Private key import is a slow operation that " +
-		    "requires blockchain rescanning (may take many minutes).<br> The GUI " +
+		    "requires blockchain rescanning (may take many minutes). The GUI " +
 			"will not be usable for other functions during this time</html>"), 
 			BorderLayout.CENTER);
 		controlsPanel.add(tempPanel);
@@ -118,7 +118,7 @@ public class SingleKeyImportDialog
 		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 8));
 		controlsPanel.add(dividerLabel);
 		
-		tempPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(progress = new JProgressBar());
 		controlsPanel.add(tempPanel);
 		
@@ -157,7 +157,7 @@ public class SingleKeyImportDialog
 			}
 		});
 		
-		this.pack(); // this looks better on OSX
+		this.setSize(740, 210);
 		this.validate();
 		this.repaint();
 	}

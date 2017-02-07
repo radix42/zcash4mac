@@ -37,7 +37,7 @@
 	
 	<!-- props for the app bundler -->
 	<property name="appbundler.jar" value="antlib/appbundler-1.0.jar" />
-	<property name="osx.app.dir" value="${build.dir}/osxapp" />
+	<property name="win.app.dir" value="${build.dir}/winapp" />
 
     <property name="main-class"  value="com.vaklinov.zcashui.ZCashUI"/>
 
@@ -46,6 +46,11 @@
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
+	
+	<path id="jdeb.jar">
+	    <pathelement path="${basedir}/lib/jdeb-1.5.jar" />
+	</path>
+	<taskdef name="deb" classpathref="jdeb.jar" classname="org.vafer.jdeb.ant.DebAntTask"/>
 	
     <target name="clean">
         <delete dir="${build.dir}"/>
@@ -81,17 +86,33 @@
         </jar>
     </target>
 	
+    <target name="ubuntuPackage" depends="jar">	
+    	<mkdir dir="${ubuntu.package.dir}"/>
+	    <deb destfile="${ubuntu.package.dir}/${ant.project.name}.deb" 
+	    	 control="${src.dir}/resources/ubuntu-package" 
+	    	 verbose="true">
+	    	
+	      <data src="${jar.dir}/${ant.project.name}.jar" type="file">
+	        <mapper type="perm" filemode="755" prefix="/usr/lib/zcash-gui-wallet"/>
+	      </data>
+	      <data src="${src.dir}/resources/ubuntu-package/zcash-swing-wallet-ui" type="file">
+	        <mapper type="perm" filemode="755" prefix="/usr/bin"/>
+	      </data>	    	
+	    </deb>
+	</target>
+	
+	
 	<target name="copyothers">
 		
 	</target>
 
-    <target name="buildit" depends="clean,jar,copyothers">
+    <target name="buildit" depends="clean,jar,copyothers,ubuntuPackage">
     	<!-- Final cleanup -->
     	<delete dir="${classes.dir}"/>
 	</target>
 
 	<!-- ############################ -->
-	<!-- everything below this is for the mac bundler -->
+	<!-- everything below this is for the win bundler -->
 	<!-- ############################ -->
 	
 	<!-- get a handle on the environment -->
@@ -111,49 +132,23 @@
 		</fail>
 	</target>
 	
-	<!-- fail if signing identity is not defined -->
-    <target name="checkSigningIdentity">
-        <fail message="SIGN_WITH has to be set!">
-            <condition>
-                <or>
-                    <equals arg1="${env.SIGN_WITH}" arg2="" />
-                    <not>
-                        <isset property="env.SIGN_WITH" />
-                    </not>
-                </or>
-            </condition>
-        </fail>
-    </target>	
-	
-	<!-- fail if not on OSX -->
-	<target name="checkOSX">
-		 <fail message="This target can only run on OSX">
-		    <condition>
-		    	  <not>
-		        <os family="mac"/>
-		    	  </not>
-		    	</condition>
-		 </fail>
-	</target>
-		
 	<!-- ############################ -->
 	<!-- Java FX packager -->
 	<!-- ############################ -->
 	
-	<target name="osxbundle" depends="checkJavaHome,checkSigningIdentity,checkOSX,jar">
+	<target name="wininst" depends="checkJavaHome,jar">
 		
 	    <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"      
 	                uri="javafx:com.sun.javafx.tools.ant"
 	                classpath=".:${env.JAVA_HOME}/lib/ant-javafx.jar"/>
 	
 		<fx:application id="wallet"
-			name="zcash4mac" 
+			name="zcash4win" 
 			mainClass="${main-class}"
 			version="@version@"/>
 		
 		<fx:resources id="appRes">
 			<fx:fileset type="jar" dir="lib" includes="**/*.jar" />
-			<fx:fileset type="data" file="macosx/logging.properties" />
 		</fx:resources>
 		
 		<fx:jar destfile="${jar.dir}/${ant.project.name}-combined.jar">
@@ -167,8 +162,8 @@
 		</fx:jar>
 		
 		<fx:deploy 
-			nativeBundles="DMG"
-			outdir="${osx.app.dir}"
+			nativeBundles="exe"
+			outdir="${win.app.dir}"
 			outfile="${ant.project.name}"
 			verbose="true"
 			>
@@ -178,13 +173,10 @@
 			<fx:resources>
 				<fx:fileset type="jar" file="${jar.dir}/${ant.project.name}-combined.jar"/>
 				<fx:fileset type="jar" dir="lib" includes="**/*.jar" />
-				<fx:fileset type="data" file="macosx/logging.properties" />
-				<fx:fileset type="data" file="macosx/first-run.sh" />
-				<fx:fileset type="data" file="macosx/zcashd" />
-				<fx:fileset type="data" file="macosx/zcash-cli" />
-				<fx:fileset type="data" file="macosx/libstdc++.6.dylib" />
-				<fx:fileset type="data" file="macosx/libgcc_s.1.dylib" />
-				<fx:fileset type="license" file="macosx/license.txt" />
+				<fx:fileset type="data" file="win/first-run.bat" />
+				<fx:fileset type="data" file="win/zcashd.exe" />
+				<fx:fileset type="data" file="win/zcash-cli.exe" />
+				<fx:fileset type="license" file="win/license.txt" />
 			</fx:resources>
 			
 			<fx:platform>
@@ -192,11 +184,9 @@
 				<fx:jvmarg value="-Dlaunching.from.appbundle=true" />
 
 				<fx:jvmarg value="-Djava.util.logging.config.file=logging.properties" />
-				<fx:jvmarg value="-Dwallet.name=zcash4mac" />
+				<fx:jvmarg value="-Dwallet.name=zcash4win" />
 				<fx:jvmarg value="-Dwallet.version=@version@"/>
 			</fx:platform>
-			
-			<fx:bundleArgument arg="mac.signing-key-user-name" value="${env.SIGN_WITH}"/>
 			
 		</fx:deploy>
 	</target>

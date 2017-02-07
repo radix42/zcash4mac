@@ -1,8 +1,8 @@
-# [ZCash](https://z.cash/) Desktop GUI Wallet - binary release v0.35-beta
+# [ZCash](https://z.cash/) Desktop GUI Wallet - binary release v0.46-beta
 
-This document describes how to install binary release v0.35-beta of the [ZCash](https://z.cash/) 
+This document describes how to install binary release v0.46-beta of the [ZCash](https://z.cash/) 
 Desktop GUI Wallet. This release of the ZCash Desktop GUI Wallet is tested with ZCash version 
-[v1.0.0](https://github.com/zcash/zcash/releases/tag/v1.0.0). Users who encounter issues 
+[v1.0.3](https://github.com/zcash/zcash/releases/tag/v1.0.3). Users who encounter issues 
 not listed in the list of known issues and limitations, are welcome to report them in 
 the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues). 
 
@@ -12,7 +12,7 @@ the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues).
 
 1. Downloading the wallet
  
-   Download file [ZCashSwingWalletUI.jar](https://github.com/vaklinov/zcash-swing-wallet-ui/releases/download/0.35-beta/ZCashSwingWalletUI.jar)
+   Download file [ZCashSwingWalletUI.jar](https://github.com/vaklinov/zcash-swing-wallet-ui/releases/download/0.46-beta/ZCashSwingWalletUI.jar)
    and place it in a folder like `~/Downloads`. Then please make the JAR executable with a command like:
    ```
    user@ubuntu:~/Downloads$ chmod u+x ./ZCashSwingWalletUI.jar
@@ -24,9 +24,9 @@ the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues).
    need to compute its SHA256 checksum, like this:
    ```
    user@ubuntu:~/Downloads$ sha256sum ZCashSwingWalletUI.jar 
-   921fa5b7113ead17882104046f8ad2b6132f678db9d05e0454bf416f0980a210  ZCashSwingWalletUI.jar
+   d5b9fd49d65b6465fb3ebc57cdf188aced666feb93bb0798f5ea168b69afb55d  ZCashSwingWalletUI.jar
    ```
-   **If the resulting checksum is not `921fa5b7113ead17882104046f8ad2b6132f678db9d05e0454bf416f0980a210` then**
+   **If the resulting checksum is not `d5b9fd49d65b6465fb3ebc57cdf188aced666feb93bb0798f5ea168b69afb55d` then**
    **something is wrong and you should discard the downloaded wallet!**
 
 3. Installing the downloaded ZCash GUI wallet
@@ -34,7 +34,7 @@ the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues).
   3.1. If you have built ZCash from source code:
 
    Assuming you have already built from source code [ZCash](https://z.cash/) in directory `/home/user/zcash/src` (for 
-   example - this is the typical build dir. for ZCash v1.0.0) which contains the command line tools `zcash-cli` 
+   example - this is the typical build dir. for ZCash v1.0.3) which contains the command line tools `zcash-cli` 
    and `zcashd` you need to take the file `ZCashSwingWalletUI.jar` and copy it 
    to diretcory `/home/user/zcash/src` (the same dir. that contains `zcash-cli` and `zcashd`). Example copy command:
    ```

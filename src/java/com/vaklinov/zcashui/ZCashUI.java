@@ -30,6 +30,7 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -57,10 +58,13 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.plaf.FontUIResource;
 
+import com.vaklinov.zcashui.OSUtil.OS_TYPE;
+import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
+import com.vaklinov.zcashui.ZCashInstallationObserver.DAEMON_STATUS;
+import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionException;
 
 /**
@@ -106,20 +110,28 @@ public class ZCashUI
     private JMenuItem menuItemExportKeys;
     private JMenuItem menuItemImportKeys;
     private JMenuItem menuItemShowPrivateKey;
-    private JMenuItem menuItemImportSinglePrivateKey;
+    private JMenuItem menuItemImportOnePrivateKey;
+    private JMenuItem menuItemAddressBook;
 
     private DashboardPanel dashboard;
     private AddressesPanel addresses;
     private SendCashPanel  sendPanel;
-    private AddressBookPanel bookPanel;
+    
+    JTabbedPane tabs;
 
-    public ZCashUI(ZCashClientCaller clientCaller)
+    public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super(NAME + " "+VERSION);
+        super("zcash4win 1.0.5");
+        
+        if (progressDialog != null)
+        {
+        	progressDialog.setProgressText("Starting GUI wallet...");
+        }
+        
         ClassLoader cl = this.getClass().getClassLoader();
 
-        this.setIconImage(new ImageIcon(cl.getResource("images/"+NAME+"-246x246.png")).getImage());
+        this.setIconImage(new ImageIcon(cl.getResource("images/zcash-logo-large.png")).getImage());
 
         Container contentPane = this.getContentPane();
 
@@ -128,7 +140,7 @@ public class ZCashUI
         this.clientCaller = clientCaller;
 
         // Build content
-        JTabbedPane tabs = new JTabbedPane();
+        tabs = new JTabbedPane();
         Font oldTabFont = tabs.getFont();
         Font newTabFont  = new Font(oldTabFont.getName(), Font.BOLD | Font.ITALIC, oldTabFont.getSize() * 57 / 50);
         tabs.setFont(newTabFont);
@@ -156,8 +168,8 @@ public class ZCashUI
         JMenu file = new JMenu("Main");
         file.setMnemonic(KeyEvent.VK_M);
         int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
-	        file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_A));
-        menuItemAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, accelaratorKeyMask));
+        file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_T));
+        menuItemAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, accelaratorKeyMask));
         file.addSeparator();
         file.add(menuItemExit = new JMenuItem("Quit", KeyEvent.VK_Q));
         menuItemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelaratorKeyMask));
@@ -175,10 +187,15 @@ public class ZCashUI
         menuItemImportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, accelaratorKeyMask));
         wallet.add(menuItemShowPrivateKey = new JMenuItem("Show private key...", KeyEvent.VK_P));
         menuItemShowPrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, accelaratorKeyMask));
-        wallet.add(menuItemImportSinglePrivateKey = new JMenuItem("Import one private key...", KeyEvent.VK_N));
-        menuItemImportSinglePrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, accelaratorKeyMask));
-        
+        wallet.add(menuItemImportOnePrivateKey = new JMenuItem("Import one private key...", KeyEvent.VK_N));
+        menuItemImportOnePrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, accelaratorKeyMask));        
         mb.add(wallet);
+        
+        JMenu extras = new JMenu("Extras");
+        extras.setMnemonic(KeyEvent.VK_R);
+        extras.add(menuItemAddressBook = new JMenuItem("Address book...", KeyEvent.VK_D));
+        menuItemAddressBook.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
+        mb.add(extras);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
         menuItemEncrypt.setEnabled(false);
@@ -271,10 +288,28 @@ public class ZCashUI
             }
        );
        
-       menuItemImportSinglePrivateKey.addActionListener( (e) -> {
+       menuItemImportOnePrivateKey.addActionListener(   
+           new ActionListener()
+           {
+               @Override
+               public void actionPerformed(ActionEvent e)
+               {
                    ZCashUI.this.walletOps.importSinglePrivateKey();
                }
+           }
        );
+       
+       menuItemAddressBook.addActionListener(   
+           new ActionListener()
+           {
+               @Override
+               public void actionPerformed(ActionEvent e)
+               {
+            	   ZCashUI.this.walletOps.showAddressBook();
+               }
+           }
+        );
+
 
         // Close operation
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -295,7 +330,7 @@ public class ZCashUI
                 try
                 {
                     String userDir = OSUtil.getSettingsDirectory();
-                    File warningFlagFile = new File(userDir + "/initialInfoShown.flag");
+                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown.flag");
                     if (warningFlagFile.exists())
                     {
                         return;
@@ -312,10 +347,9 @@ public class ZCashUI
 
                 JOptionPane.showMessageDialog(
                     ZCashUI.this.getRootPane().getParent(),
-                    "The ZCash GUI Wallet is currently considered experimental. Use of this software\n" +
-                    "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
-                    "at this page: \n" +
-                    "https://github.com/vaklinov/zcash-swing-wallet-ui#known-issues-and-limitations\n\n" +
+                    "This program is not officially endorsed by or associated with the ZCash project\n" +
+                    "and the ZCash company. ZCash and the ZCash logo are trademarks of the\n" +
+                    "Zerocoin Electric Coin Company.\n\n"+ 
                     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
                     "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
                     "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
@@ -327,14 +361,33 @@ public class ZCashUI
                     "Disclaimer", JOptionPane.INFORMATION_MESSAGE);
             }
         });
+        
+        // Finally dispose of the progress dialog
+        if (progressDialog != null)
+        {
+        	progressDialog.doDispose();
+        }
     }
 
     public void exitProgram()
     {
         LOG.info("Exiting ...");
 
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        
         this.dashboard.stopThreadsAndTimers();
+        this.addresses.stopThreadsAndTimers();
+        this.sendPanel.stopThreadsAndTimers();
 
+//        Integer blockchainProgress = this.dashboard.getBlockchainPercentage();
+//        
+//        if ((blockchainProgress != null) && (blockchainProgress >= 100))
+//        {
+//	        this.dashboard.waitForEndOfThreads(3000);
+//	        this.addresses.waitForEndOfThreads(3000);
+//	        this.sendPanel.waitForEndOfThreads(3000);
+//        }
+        
         ZCashUI.this.setVisible(false);
         ZCashUI.this.dispose();
 
@@ -346,32 +399,77 @@ public class ZCashUI
     {
         try
         {
-            LOG.info("Starting "+NAME+" "+VERSION+"...");
-            LOG.info("OS: " + System.getProperty("os.name") + " = " + OSUtil.getOSType());
-            LOG.info("Current directory: " + new File(".").getCanonicalPath());
-            LOG.info("Class path: " + System.getProperty("java.class.path"));
-            LOG.info("Environment PATH: " + System.getenv("PATH"));
+        	OS_TYPE os = OSUtil.getOSType();
+        	
+            System.out.println("Starting zcash4win ...");
+            System.out.println("OS: " + System.getProperty("os.name") + " = " + os);
+            System.out.println("Current directory: " + new File(".").getCanonicalPath());
+            System.out.println("Class path: " + System.getProperty("java.class.path"));
+            System.out.println("Environment PATH: " + System.getenv("PATH"));
 
-            ////////////////////////////////////////////////////////////
-            if (OSUtil.getOSType() != OSUtil.OS_TYPE.MAC_OS) {
-                for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
+            // Look and feel settings - for now a custom OS-look and feel is set for Windows,
+            // Mac OS will follow later.
+            if (os == OS_TYPE.WINDOWS)
+            {
+            	// Custom Windows L&F and font settings
+            	UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            	
+            	// This font looks good but on Windows 7 it misses some chars like the stars...
+            	//FontUIResource font = new FontUIResource("Lucida Sans Unicode", Font.PLAIN, 11);
+            	//UIManager.put("Table.font", font);
+            } else
+            {            
+	            for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
+	            {
+	                System.out.println("Available look and feel: " + ui.getName() + " " + ui.getClassName());
+	                if (ui.getName().equals("Nimbus"))
+	                {
+	                    UIManager.setLookAndFeel(ui.getClassName());
+	                    break;
+	                };
+	            }
+            }
+            
+            // If zcashd is currently not running, do a startup of the daemon as a child process
+            // It may be started but not ready - then also show dialog
+            ZCashInstallationObserver initialInstallationObserver = 
+            	new ZCashInstallationObserver(OSUtil.getProgramDirectory());
+            DaemonInfo zcashdInfo = initialInstallationObserver.getDaemonInfo();
+            initialInstallationObserver = null;
+            
+            ZCashClientCaller initialClientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
+            boolean daemonStartInProgress = false;
+            try
+            {
+            	if (zcashdInfo.status == DAEMON_STATUS.RUNNING)
+            	{
+            		NetworkAndBlockchainInfo info = initialClientCaller.getNetworkAndBlockchainInfo();
+            		// If more than 20 minutes behind in the blockchain - startup in progress
+            		if ((System.currentTimeMillis() - info.lastBlockDate.getTime()) > (20 * 60 * 1000))
+            		{
+            			daemonStartInProgress = true;
+            		}
+            	}
+            } catch (WalletCallException wce)
+            {
+                if (wce.getMessage().indexOf("{\"code\":-28") != -1) // Started but not ready
                 {
-                    LOG.info("Available look and feel: " + ui.getName() + " " + ui.getClassName());
-                    if (ui.getName().equals("Nimbus"))
-                    {
-                        UIManager.setLookAndFeel(ui.getClassName());
-                        break;
-                    }
+                	daemonStartInProgress = true;
                 }
-            } else 
-                System.setProperty("apple.laf.useScreenMenuBar", "true");
-
-            /////////////////////////////////////////////////////
-            ZCashClientCaller clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
-            StartupProgressDialog startupBar = new StartupProgressDialog(clientCaller);
-            startupBar.setVisible(true);
-            startupBar.waitForStartup();
-            ZCashUI ui = new ZCashUI(clientCaller);
+            }
+            
+            StartupProgressDialog startupBar = null;
+            if ((zcashdInfo.status != DAEMON_STATUS.RUNNING) || (daemonStartInProgress))
+            {
+            	System.out.println("zcashd is not runing at the moment or has not started/synchronized 100%...");
+	            startupBar = new StartupProgressDialog(initialClientCaller);
+	            startupBar.setVisible(true);
+	            startupBar.waitForStartup();
+            }
+            initialClientCaller = null;
+            
+            // Main GUI is created here
+            ZCashUI ui = new ZCashUI(startupBar);
             ui.setVisible(true);
 
         } catch (InstallationDetectionException ide)
@@ -408,7 +506,7 @@ public class ZCashUI
                     null,
                     "There was a problem communicating with the ZCash daemon/wallet. \n" +
                     "Please ensure that the ZCash server zcashd is started (e.g. via \n" + 
-                    "command  \"zcashd --daemon\"). Error message is: \n" +
+                    "command  \"zcashd.exe --daemon\"). Error message is: \n" +
                      wce.getMessage() +
                     "See the console output for more detailed error information!",
                     "Wallet communication error",
