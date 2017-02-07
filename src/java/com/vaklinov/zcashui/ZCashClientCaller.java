@@ -41,8 +41,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
@@ -60,8 +58,6 @@ import com.vaklinov.zcashui.OSUtil.OS_TYPE;
  */
 public class ZCashClientCaller
 {
-    private static final Logger LOG = Logger.getLogger(ZCashClientCaller.class.getName());
-    
 	public static class WalletBalance
 	{
 		public double transparentBalance;
@@ -129,7 +125,7 @@ public class ZCashClientCaller
 		{
 		    throw new IOException(
 		    	"The ZCash command line utility " + zcashcli.getCanonicalPath() + 
-		    	" was found, but zcashd.exe was not found!");
+		    	" was found, but zcashd was not found!");
 		}
 	}
 
@@ -477,7 +473,7 @@ public class ZCashClientCaller
 		  	throw new WalletCallException("Error response from wallet: " + strResponse);
 		}
 
-		LOG.info("Sending cash with the following command: " +
+		System.out.println("Sending cash with the following command: " +
                 sendCashParameters[0] + " " + sendCashParameters[1] + " " +
                 sendCashParameters[2] + " " + sendCashParameters[3] + " " +
                 sendCashParameters[4] + " " + sendCashParameters[5] + "." +
@@ -496,7 +492,7 @@ public class ZCashClientCaller
 
 		String status = jsonStatus.getString("status", "ERROR");
 
-		LOG.info("Operation " + opID + " status is " + response + ".");
+		System.out.println("Operation " + opID + " status is " + response + ".");
 
 		if (status.equalsIgnoreCase("success") ||
 			status.equalsIgnoreCase("error") ||
@@ -522,7 +518,7 @@ public class ZCashClientCaller
 
 		String status = jsonStatus.getString("status", "ERROR");
 
-		LOG.info("Operation " + opID + " status is " + response + ".");
+		System.out.println("Operation " + opID + " status is " + response + ".");
 
 		if (status.equalsIgnoreCase("success"))
 		{
@@ -908,58 +904,4 @@ public class ZCashClientCaller
 		}
 	}
 
-
-   // Imports a private key - tries both possibilities T/Z
-   public void importPrivateKey(String key)
-       throws WalletCallException, IOException, InterruptedException
-   {
-       // First try a Z key
-       String[] params = new String[] { this.zcashcli.getCanonicalPath(), "z_importkey", key };
-       CommandExecutor caller = new CommandExecutor(params);
-       String strResult = caller.execute();
-       
-       if ((strResult == null) || (strResult.trim().length() <= 0))
-       {
-           return;
-       }
-       
-       // Obviously we have an error trying to import a Z key
-       if (strResult.trim().toLowerCase().startsWith("error:"))
-       {
-                // Expecting an error of a T address key
-                String jsonPart = strResult.substring(strResult.indexOf("{"));
-            JsonValue response = null;
-            try
-            {
-               response = Json.parse(jsonPart);
-            } catch (ParseException pe)
-            {
-                throw new WalletCallException(jsonPart + "\n" + pe.getMessage() + "\n", pe);
-            }
-
-            JsonObject respObject = response.asObject();
-            if ((respObject.getDouble("code", +123) == -1) &&
-                (respObject.getString("message", "ERR").indexOf("wrong network type") != -1))
-            {
-                // Obviously T address - do nothing here
-            } else
-            {
-                throw new WalletCallException("Unexpected response from wallet: " + strResult);
-            }
-       } else
-       {
-           throw new WalletCallException("Unexpected response from wallet: " + strResult);
-       }
-       
-       // Second try a T key
-       strResult = this.executeCommandAndGetSingleStringResponse("importprivkey", key);
-       
-       if ((strResult == null) || (strResult.trim().length() <= 0))
-       {
-           return;
-       }
-       
-       // Obviously an error
-       throw new WalletCallException("Unexpected response from wallet: " + strResult);
-   }
 }
