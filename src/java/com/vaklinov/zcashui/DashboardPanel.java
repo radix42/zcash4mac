@@ -122,7 +122,7 @@ public class DashboardPanel
 			this.getClass().getClassLoader().getResource("images/zcash4win-logo-small.png")));
 		tempPanel.add(logoLabel);
 		//tempPanel.add(new JLabel(" "));
-		JLabel zcLabel = new JLabel("Cash Wallet        ");
+		JLabel zcLabel = new JLabel("cash4win        ");
 		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 32));
 		tempPanel.add(zcLabel);
 		tempPanel.setToolTipText("Powered by ZCash\u00AE");

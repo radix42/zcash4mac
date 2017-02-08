@@ -60,8 +60,7 @@ public class StartupProgressDialog extends JFrame {
         contentPane.add(imageLabel, BorderLayout.NORTH);
 		JLabel zcashWalletLabel = new JLabel(
 			"<html><span style=\"font-style:italic;font-weight:bold;font-size:25px\">" + 
-		    "ZCash<span style=\"font-style:italic;font-weight:bold;font-size:15px;vertical-align:super\">" + 
-		    "\u00AE</span> Wallet</span></html>");
+		    "zcash4win</span></html>");
 		zcashWalletLabel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
 		contentPane.add(zcashWalletLabel, BorderLayout.CENTER);
         contentPane.add(southPanel, BorderLayout.SOUTH);
@@ -79,7 +78,7 @@ public class StartupProgressDialog extends JFrame {
         InterruptedException,WalletCallException,InvocationTargetException {
         
         // special handling of Windows app launch
-        if (OSUtil.getOSType() == OS_TYPE.MAC_OS) {
+        if (OSUtil.getOSType() == OS_TYPE.WINDOWS) {
             ProvingKeyFetcher keyFetcher = new ProvingKeyFetcher();
             keyFetcher.fetchIfMissing(this);
             if ("true".equalsIgnoreCase(System.getProperty("launching.from.appbundle")))
@@ -210,7 +209,9 @@ public class StartupProgressDialog extends JFrame {
 
     private void performWinBundleLaunch() throws IOException, InterruptedException {
         System.out.println("performing Win Bundle-specific launch");
-        File bundlePath = new File(System.getProperty("zcash.location.dir"));
+	String programFiles = System.getenv("PROGRAMFILES");
+	File pf = new File(programFiles);
+	File bundlePath = new File(pf, "zcash4win/app");
         bundlePath = bundlePath.getCanonicalFile();
         
         // run "first-run.bat"
