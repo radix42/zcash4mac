@@ -3,8 +3,8 @@
 [Setup]
 AppId={{wallet}}
 AppName=zcash4win
-AppVersion=@version@
-AppVerName=zcash4win @version@
+AppVersion=1.0.5-248
+AppVerName=zcash4win 1.0.5-248
 AppPublisher=MercerWeiss Consulting
 AppComments=zcash4win
 AppCopyright=Copyright (C) 2017 David Mercer
@@ -23,7 +23,7 @@ DefaultGroupName=Unknown
 LicenseFile=license.txt
 ;Win7 or above
 MinVersion=0,6.1 
-OutputBaseFilename=zcash4win-@version@
+OutputBaseFilename=zcash4win-1.0.5-248
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=lowest
