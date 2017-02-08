@@ -182,8 +182,6 @@
 			<fx:platform>
 				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR/Java" />
 				<fx:jvmarg value="-Dlaunching.from.appbundle=true" />
-
-				<fx:jvmarg value="-Djava.util.logging.config.file=logging.properties" />
 				<fx:jvmarg value="-Dwallet.name=zcash4win" />
 				<fx:jvmarg value="-Dwallet.version=@version@"/>
 			</fx:platform>

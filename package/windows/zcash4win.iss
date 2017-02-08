@@ -5,10 +5,10 @@ AppId={{wallet}}
 AppName=zcash4win
 AppVersion=@version@
 AppVerName=zcash4win @version@
-AppPublisher=Unknown
+AppPublisher=MercerWeiss Consulting
 AppComments=zcash4win
-AppCopyright=Copyright (C) 2017
-;AppPublisherURL=http://java.com/
+AppCopyright=Copyright (C) 2017 David Mercer
+AppPublisherURL=http://zcash4win.com
 ;AppSupportURL=http://java.com/
 ;AppUpdatesURL=http://java.com/
 DefaultDirName={localappdata}\zcash4win
@@ -21,8 +21,8 @@ DisableWelcomePage=Yes
 DefaultGroupName=Unknown
 ;Optional License
 LicenseFile=license.txt
-;WinXP or above
-MinVersion=0,5.1 
+;Win7 or above
+MinVersion=0,6.1 
 OutputBaseFilename=zcash4win-@version@
 Compression=lzma
 SolidCompression=yes

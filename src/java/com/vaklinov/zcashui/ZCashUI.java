@@ -6,7 +6,7 @@
  * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
  *                                                 |___/
  *
- * Copyright (c) 2017 David Mercer <radix42@gmail.com> and Ivan Vaklinov <ivan@vaklinov.com>
+ * Copyright (c) 2017 David Mercer <david@mercerweiss.com> and Ivan Vaklinov <ivan@vaklinov.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -67,7 +67,7 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionExcep
 /**
  * Main ZCash Window.
  *
- * @author David Mercer <radix42@gmail.com>
+ * @author David Mercer <david@mercerweiss.com>
  */
 public class ZCashUI
     extends JFrame
