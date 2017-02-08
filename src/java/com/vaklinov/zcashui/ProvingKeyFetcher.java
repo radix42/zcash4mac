@@ -48,13 +48,11 @@ public class ProvingKeyFetcher {
     }
     
     private void verifyOrFetch(StartupProgressDialog parent) throws IOException {
-        File zCashParams = new File(System.getProperty("user.home") + "/Library/Application Support/ZcashParams");
+        File zCashParams = new File(System.getenv("APPDATA") + "/ZcashParams");
         zCashParams = zCashParams.getCanonicalFile();
         
         boolean needsFetch = false;
         if (!zCashParams.exists()) {
-            
-            LOG.info(zCashParams.getCanonicalPath()+" did not exist");
             
             needsFetch = true;
             zCashParams.mkdirs();
