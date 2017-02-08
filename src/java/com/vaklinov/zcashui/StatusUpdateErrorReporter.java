@@ -72,7 +72,7 @@ public class StatusUpdateErrorReporter
 		JOptionPane.showMessageDialog(
 			parent, 
 			"An unexpected error occurred when updating the GUI wallet\n" +
-			"state. Please ensure that the ZCaash daemon is running. \n" +
+			"state. Please ensure that the ZCash daemon is running. \n" +
 			"\n" +
 			e.getMessage(),
 			"Error in updating status.", JOptionPane.ERROR_MESSAGE);
