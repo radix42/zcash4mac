@@ -425,10 +425,13 @@ public class DashboardPanel
 			
 			DecimalFormat df = new DecimalFormat("##0.##");
 			percentage = df.format(dPercentage);
+			
+			// Also set a member that may be queried
+			this.blockchainPercentage = new Integer((int)dPercentage);
+		} else
+		{
+			this.blockchainPercentage = 100;
 		}
-		
-		// Also set a member that may be queried
-		this.blockchainPercentage = new Integer(new Double(percentage).intValue());
 		
 		// Just in case early on the call returns some junk date
 		if (info.lastBlockDate.before(startDate))

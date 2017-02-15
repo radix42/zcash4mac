@@ -31,6 +31,7 @@ package com.vaklinov.zcashui;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.text.DecimalFormat;
@@ -450,21 +451,41 @@ public class ZCashClientCaller
 			transactionFee = new DecimalFormat(
 				"########0.00######", decSymbols).format(Double.valueOf(transactionFee));
 		}
+
+	    // This replacement is a hack to make sure the JSON object amount has double format 0.00 etc.
+	    // TODO: find a better way to format the amount
+		String toManyArrayStr =	toMany.toString().replace(
+		    amountPattern,
+			"\"amount\":" + new DecimalFormat("########0.00######", decSymbols).format(Double.valueOf(amount)));
 		
 		String[] sendCashParameters = new String[]
 	    {
 		    this.zcashcli.getCanonicalPath(), "z_sendmany", wrapStringParameter(from),
-		    // This replacement is a hack to make sure the JSON object amount has double format 0.00 etc.
-		    // TODO: find a better way to format the amount
-		    wrapStringParameter(toMany.toString().replace(
-		    	amountPattern,
-		    	"\"amount\":" + new DecimalFormat("########0.00######", decSymbols).format(Double.valueOf(amount)))),
+		    wrapStringParameter(toManyArrayStr),
 		    // Default min confirmations for the input transactions is 1
 		    "1",
 		    // transaction fee
 		    transactionFee
 		};
+		
+		// Safeguard to make sure the monetary amount does not differ after formatting
+		BigDecimal bdAmout = new BigDecimal(amount);
+		JsonArray toManyVerificationArr = Json.parse(toManyArrayStr).asArray();
+		BigDecimal bdFinalAmount = 
+			new BigDecimal(toManyVerificationArr.get(0).asObject().getDouble("amount", -1));
+		BigDecimal difference = bdAmout.subtract(bdFinalAmount).abs();
+		if (difference.compareTo(new BigDecimal("0.000000015")) >= 0)
+		{
+			throw new WalletCallException("Error in forming z_sendmany command: Amount differs after formatting: " + 
+		                                  amount + " | " + toManyArrayStr);
+		}
 
+		System.out.println("The following send command will be issued: " +
+                sendCashParameters[0] + " " + sendCashParameters[1] + " " +
+                sendCashParameters[2] + " " + sendCashParameters[3] + " " +
+                sendCashParameters[4] + " " + sendCashParameters[5] + ".");
+		
+		// Create caller to send cash
 	    CommandExecutor caller = new CommandExecutor(sendCashParameters);
 	    String strResponse = caller.execute();
 
