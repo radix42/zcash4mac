@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Product Id="a6a11bac-bfdf-4140-8213-49078ee5f14b" Name="zcash4win" 
+             Language="1033" Version="1.0.6"
+             Manufacturer="Unknown" 
+             UpgradeCode="d6e3211f-3831-4424-82a6-fe0d8a0edf89">
+        <Package Description="zcash4win" Comments="None"
+                 InstallerVersion="200" Compressed="yes"
+                 InstallScope="perMachine" Platform="x64"/>
+        <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+
+        <!-- We use RemoveFolderEx to ensure application folder is fully 
+             removed on uninstall. Including files created outside of MSI
+             after application had been installed (e.g. on AU or user state).
+             
+             Hovewer, RemoveFolderEx is only available in WiX 3.6, 
+             we will comment it out if we running older WiX.
+
+             RemoveFolderEx requires that we "remember" the path for uninstall.
+             Read the path value and set the APPLICATIONFOLDER property with the value.
+        -->
+        <Property Id="APPLICATIONFOLDER">
+            <RegistrySearch Key="SOFTWARE\Unknown\zcash4win" 
+                            Root="HKLM" Type="raw" 
+                            Id="APPLICATIONFOLDER_REGSEARCH" Name="Path" />
+        </Property>
+        <DirectoryRef Id="APPLICATIONFOLDER">
+            <Component Id="CleanupMainApplicationFolder" Guid="*" Win64="yes">
+                <RegistryValue Root="HKLM"
+                                   Key="SOFTWARE\Unknown\zcash4win"
+                                   Name="Path" Type="string" Value="[APPLICATIONFOLDER]"
+                                   KeyPath="yes" />
+                <!-- We need to use APPLICATIONFOLDER variable here or RemoveFolderEx
+                     will not remove on "install". But only if WiX 3.6 is used. -->
+                <!--     
+                  <util:RemoveFolderEx On="uninstall" Property="APPLICATIONFOLDER" />
+                -->
+            </Component>
+        </DirectoryRef>        
+        <?include bundle.wxi ?>
+     <UI>
+     <UIRef Id="WixUI_Minimal" />
+     </UI>
+
+
+        <Icon Id="DesktopIcon.exe" SourceFile="zcash4win.ico" />
+        <Icon Id="StartMenuIcon.exe" SourceFile="zcash4win.ico" />
+
+    </Product>
+</Wix>
