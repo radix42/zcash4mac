@@ -206,7 +206,8 @@ public class ZCashInstallationObserver
 		{
 			StringTokenizer st = new StringTokenizer(line, " \t", false);
 			boolean foundZCash = false;
-			for (int i = 0; i < 5; i++)
+			String size = "";
+			for (int i = 0; i < 8; i++)
 			{
 				String token = null;
 				if (st.hasMoreTokens())
@@ -235,24 +236,30 @@ public class ZCashInstallationObserver
 						foundZCash = true;
 						//System.out.println("ZCashd process data is: " + line);
 					}
-				} else if ((i == 4) && foundZCash)
+				} else if ((i >= 4) && foundZCash)
 				{
 					try
 					{
-						String size = token;
-						size = size.replaceAll(",", "");
-						if (size.endsWith(" K"))
+						size += token.replaceAll("[^0-9]", "");
+						if (size.endsWith("K"))
 						{
-							size = size.substring(0, size.length() - 2);
+							size = size.substring(0, size.length() - 1);
 						}
-						
-					    info.residentSizeMB = Double.valueOf(size) / 1000;
 					} catch (NumberFormatException nfe) { /* TODO: Log or handle exception */ };
 				} 
-			}
+			} // End parsing row
 
 			if (foundZCash)
 			{
+				try
+				{
+					info.residentSizeMB = Double.valueOf(size) / 1000;
+				} catch (NumberFormatException nfe)
+				{
+					info.residentSizeMB = 0;
+					System.out.println("Error: could not find the numeric memory size of zcashd: " + size);
+				};
+				
 				break;
 			}
 		}

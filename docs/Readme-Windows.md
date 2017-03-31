@@ -10,7 +10,7 @@ Before installing the GUI wallet on Windows you need to install ZCash on Windows
 
    The easiest way to install it is to use the binary version provided by [@radix42](https://github.com/radix42):
 
-   1.1. Download the ZCash node [ZCash-v1.0.5.zip](https://zcash.dl.mercerweiss.com/zcash-v1.0.5-rc1.zip)
+   1.1. Download the ZCash node [ZCash-v1.0.6b.zip](https://zcash.dl.mercerweiss.com/zcash-v1.0.6b.zip)
 
    1.2. Unzip the file so that the executables `zcashd.exe` and `zcash-cli.exe` are in one directory.
    
@@ -35,7 +35,7 @@ Before installing the GUI wallet on Windows you need to install ZCash on Windows
    2.1. Install JDK 8 for Windows - e.g. [use this good tutorial](http://www.wikihow.com/Install-the-Java-Software-Development-Kit)
 
    2.2. You may use the [latest binary release of the ZCash Desktop GUI wallet](https://github.com/vaklinov/zcash-swing-wallet-ui/releases/latest).
-   Download file [ZCashSwingWalletUI.jar](https://github.com/vaklinov/zcash-swing-wallet-ui/releases/download/0.58-beta/ZCashSwingWalletUI.jar)
+   Download file [ZCashSwingWalletUI.jar](https://github.com/vaklinov/zcash-swing-wallet-ui/releases/download/0.62-beta/ZCashSwingWalletUI.jar)
    and place it in the same folder as `zcashd.exe` and `zcash-cli.exe`. The result needs to be similar to:
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWinDir.png "ZCash directory on Windows")
 
@@ -76,6 +76,9 @@ SOFTWARE.
 
 ### Known issues and limitations
 
+1. Issue: Wallet versions 0.58 and below, when running on Windows systems with (typically non-western) locales that
+redefine the decimal point in the Windows locale settings, have problems with updating the GUI wallet state. 
+A workaround is to change the Windows [locale settings](https://windows.lbl.gov/software/optics/5-1-2/Optics4.jpg) to have dot as decimal separator.
 1. Limitation: Wallet encryption has been temporarily disabled in ZCash due to stability problems. A corresponding issue 
 [#1552](https://github.com/zcash/zcash/issues/1552) has been opened by the ZCash developers. Correspondingly
 wallet encryption has been temporarily disabled in the ZCash Desktop GUI Wallet.

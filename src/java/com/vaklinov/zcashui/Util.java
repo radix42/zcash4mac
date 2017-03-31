@@ -28,6 +28,11 @@
  **********************************************************************************/
 package com.vaklinov.zcashui;
 
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.StringReader;
+
+import com.eclipsesource.json.JsonObject;
 
 /**
  * Utilities - generally reusable across classes.
@@ -88,4 +93,27 @@ public class Util
 		
 		return false;
 	}
+	
+	
+	// Turns a 1.0.7+ error message to a an old JSOn style message
+	// info - new style error message
+	public static JsonObject getJsonErrorMessage(String info)
+	    throws IOException
+	{
+    	JsonObject jInfo = new JsonObject();
+    	
+    	// Error message here comes from ZCash 1.0.7+ and is like:
+    	//zcash-cli getinfo
+    	//error code: -28
+    	//error message:
+    	//Loading block index...
+    	LineNumberReader lnr = new LineNumberReader(new StringReader(info));
+    	int errCode =  Integer.parseInt(lnr.readLine().substring(11).trim());
+    	jInfo.set("code", errCode);
+    	lnr.readLine();
+    	jInfo.set("message", lnr.readLine().trim());
+    	
+    	return jInfo;
+	}
+	
 }

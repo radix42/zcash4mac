@@ -42,6 +42,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -73,7 +74,7 @@ public class ZCashUI
     extends JFrame
 {
     private ZCashInstallationObserver installationObserver;
-    private ZCashClientCaller clientCaller;
+    private ZCashClientCaller         clientCaller;
     private StatusUpdateErrorReporter errorReporter;
 
     private WalletOperations walletOps;
@@ -86,11 +87,11 @@ public class ZCashUI
     private JMenuItem menuItemImportKeys;
     private JMenuItem menuItemShowPrivateKey;
     private JMenuItem menuItemImportOnePrivateKey;
-    private JMenuItem menuItemAddressBook;
 
-    private DashboardPanel dashboard;
-    private AddressesPanel addresses;
-    private SendCashPanel  sendPanel;
+    private DashboardPanel   dashboard;
+    private AddressesPanel   addresses;
+    private SendCashPanel    sendPanel;
+    private AddressBookPanel addressBookPanel;
     
     JTabbedPane tabs;
 
@@ -123,11 +124,14 @@ public class ZCashUI
         		    new ImageIcon(cl.getResource("images/overview.png")),
         		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, errorReporter));
         tabs.addTab("Own addresses ",
-        		    new ImageIcon(cl.getResource("images/address-book.png")),
+        		    new ImageIcon(cl.getResource("images/own-addresses.png")),
         		    addresses = new AddressesPanel(clientCaller, errorReporter));
         tabs.addTab("Send cash ",
         		    new ImageIcon(cl.getResource("images/send.png")),
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter));
+        tabs.addTab("Address book ",
+    		        new ImageIcon(cl.getResource("images/address-book.png")),
+    		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
@@ -162,12 +166,13 @@ public class ZCashUI
         wallet.add(menuItemImportOnePrivateKey = new JMenuItem("Import one private key...", KeyEvent.VK_N));
         menuItemImportOnePrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, accelaratorKeyMask));        
         mb.add(wallet);
-        
-        JMenu extras = new JMenu("Extras");
-        extras.setMnemonic(KeyEvent.VK_R);
-        extras.add(menuItemAddressBook = new JMenuItem("Address book...", KeyEvent.VK_D));
-        menuItemAddressBook.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
-        mb.add(extras);
+
+        // Some day the extras menu will be populated with less essential funcitons
+        //JMenu extras = new JMenu("Extras");
+        //extras.setMnemonic(KeyEvent.VK_ NOT R);
+        //extras.add(menuItemAddressBook = new JMenuItem("Address book...", KeyEvent.VK_D));
+        //menuItemAddressBook.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
+        //mb.add(extras);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
         menuItemEncrypt.setEnabled(false);
@@ -271,18 +276,6 @@ public class ZCashUI
            }
        );
        
-       menuItemAddressBook.addActionListener(   
-           new ActionListener()
-           {
-               @Override
-               public void actionPerformed(ActionEvent e)
-               {
-            	   ZCashUI.this.walletOps.showAddressBook();
-               }
-           }
-        );
-
-
         // Close operation
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter()
@@ -422,13 +415,17 @@ public class ZCashUI
             		// If more than 20 minutes behind in the blockchain - startup in progress
             		if ((System.currentTimeMillis() - info.lastBlockDate.getTime()) > (20 * 60 * 1000))
             		{
+            			System.out.println("Current blockchain synchronization date is"  + 
+            		                       new Date(info.lastBlockDate.getTime()));
             			daemonStartInProgress = true;
             		}
             	}
             } catch (WalletCallException wce)
             {
-                if (wce.getMessage().indexOf("{\"code\":-28") != -1) // Started but not ready
+                if ((wce.getMessage().indexOf("{\"code\":-28") != -1) || // Started but not ready
+                	(wce.getMessage().indexOf("error code: -28") != -1))
                 {
+                	System.out.println("zcashd is currently starting...");
                 	daemonStartInProgress = true;
                 }
             }
@@ -436,7 +433,8 @@ public class ZCashUI
             StartupProgressDialog startupBar = null;
             if ((zcashdInfo.status != DAEMON_STATUS.RUNNING) || (daemonStartInProgress))
             {
-            	System.out.println("zcashd is not runing at the moment or has not started/synchronized 100%...");
+            	System.out.println(
+            		"zcashd is not runing at the moment or has not started/synchronized 100% - showing splash...");
 	            startupBar = new StartupProgressDialog(initialClientCaller);
 	            startupBar.setVisible(true);
 	            startupBar.waitForStartup();
@@ -462,11 +460,8 @@ public class ZCashUI
         {
             wce.printStackTrace();
 
-            if ((wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Verifying blocks")      != -1)  ||
-            	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Rescanning")            != -1)  ||
-            	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Loading wallet")        != -1)  ||
-            	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Activating best chain") != -1)  ||
-            	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Loading addresses")     != -1))
+            if ((wce.getMessage().indexOf("{\"code\":-28,\"message\"") != -1) ||
+            	(wce.getMessage().indexOf("error code: -28") != -1))
             {
                 JOptionPane.showMessageDialog(
                         null,

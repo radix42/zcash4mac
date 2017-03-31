@@ -26,6 +26,9 @@ SOFTWARE.
 
 ### Known issues and limitations
 
+1. Issue: Wallet versions 0.58 and below, when running on systems with (typically non-western) locales that
+redefine the decimal point in the OS locale settings, have problems with updating the GUI wallet state. 
+A workaround is to change the [locale settings](https://windows.lbl.gov/software/optics/5-1-2/Optics4.jpg) to have dot as decimal separator.
 1. Limitation: Wallet encryption has been temporarily disabled in ZCash due to stability problems. A corresponding issue 
 [#1552](https://github.com/zcash/zcash/issues/1552) has been opened by the ZCash developers. Correspondingly
 wallet encryption has been temporarily disabled in the ZCash Desktop GUI Wallet.

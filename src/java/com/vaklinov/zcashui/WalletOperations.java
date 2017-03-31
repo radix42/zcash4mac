@@ -65,8 +65,6 @@ public class WalletOperations
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller         clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
-	
-	AddressBookDialog addressBookDialog = null;
 
 
 	public WalletOperations(ZCashUI parent,
@@ -419,26 +417,6 @@ public class WalletOperations
 			SingleKeyImportDialog kd = new SingleKeyImportDialog(this.parent, this.clientCaller);
 			kd.setVisible(true);
 			
-		} catch (Exception ex)
-		{
-			this.errorReporter.reportError(ex, false);
-		}
-	}
-	
-	
-	public void showAddressBook()
-	{
-		try
-		{
-			if ((this.addressBookDialog == null) ||
-				(!this.addressBookDialog.isDisplayable()))
-			{
-	   		    this.addressBookDialog = new AddressBookDialog(this.parent, this.sendCash, this.tabs);
-	   		    this.addressBookDialog.setVisible(true);
-			} else
-			{
-				this.addressBookDialog.toFront();
-			}
 		} catch (Exception ex)
 		{
 			this.errorReporter.reportError(ex, false);
