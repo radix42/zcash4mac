@@ -145,7 +145,7 @@
 		<fx:application id="wallet"
 			name="zcash4win" 
 			mainClass="${main-class}"
-			version="1.0.6"/>
+			version="1.0.8"/>
 			
 		
 		<fx:resources id="appRes">
@@ -184,7 +184,7 @@
 				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR/Java" />
 				<fx:jvmarg value="-Dlaunching.from.appbundle=true" />
 				<fx:jvmarg value="-Dwallet.name=zcash4win" />
-				<fx:jvmarg value="-Dwallet.version=1.0.6"/>
+				<fx:jvmarg value="-Dwallet.version=1.0.8"/>
 			</fx:platform>
 			
 		</fx:deploy>
