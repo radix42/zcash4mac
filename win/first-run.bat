@@ -8,7 +8,7 @@ IF NOT EXIST %AppData%\Zcash\zcash.conf (
    (
     echo addnode=mainnet.z.cash 
     echo rpcuser=username 
-    echo rpcpashword=pashword%random%%random%
+    echo rpcpassword=password%random%%random%
     echo daemon=1 
     echo showmetrics=0 
     echo gen=0 
