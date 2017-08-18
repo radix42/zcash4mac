@@ -179,6 +179,7 @@ public class SendCashPanel
 		tempPanel.add(new JLabel(" ZEC    "));
 		amountPanel.add(tempPanel, BorderLayout.SOUTH);
 
+        // Panel for xtn fee
 		JPanel feePanel = new JPanel(new BorderLayout());
 		feePanel.add(new JLabel("Transaction fee:"), BorderLayout.NORTH);
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -188,6 +189,7 @@ public class SendCashPanel
 		tempPanel.add(new JLabel(" ZEC"));
 		feePanel.add(tempPanel, BorderLayout.SOUTH);
 
+        // add xtn fee to UI panel
 		amountAndFeePanel.add(amountPanel);
 		amountAndFeePanel.add(feePanel);
 		sendCashPanel.add(amountAndFeePanel);		
@@ -196,6 +198,39 @@ public class SendCashPanel
 		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
 		sendCashPanel.add(dividerLabel);
 
+		// Donations make the world go round!!!!! And they keep David fed and happy, which makes the world go round
+		JPanel donationPanel       = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		JPanel donationAmountPanel = new JPanel(new BorderLayout());
+		donationPanel.add(new JLabel("Per Transaction Donation:"), BorderLayout.NORTH);
+
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		tempPanel.add(destinationAmountField = new JTextField(13));
+		destinationAmountField.setHorizontalAlignment(SwingConstants.RIGHT);
+		tempPanel.add(new JLabel(" ZEC    "));
+		donationPanel.add(tempPanel, BorderLayout.SOUTH);
+
+        // Panel for donation
+		JPanel donationPanel = new JPanel(new BorderLayout());
+		donationPanel.add(new JLabel("Donation:"), BorderLayout.NORTH);
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		tempPanel.add(transactiondonationField = new JTextField(13));
+		transactiondonationField.setText("0.0001"); // Default value
+		transactiondonationField.setHorizontalAlignment(SwingConstants.RIGHT);
+		tempPanel.add(new JLabel(" ZEC"));
+		donationPanel.add(tempPanel, BorderLayout.SOUTH);
+
+        // add xtn fee to UI panel
+		amountAndFeePanel.add(amountPanel);
+		donationAmountPanel.add(donationPanel);
+
+		sendCashPanel.add(amountAndFeePanel);
+		sendCashPanel.add(donationAmountPanel);
+		
+		dividerLabel = new JLabel("   ");
+		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
+		sendCashPanel.add(dividerLabel);
+
+        // Main sending UI
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(sendButton = new JButton("Send   \u27A4\u27A4\u27A4"));
 		sendCashPanel.add(tempPanel);
