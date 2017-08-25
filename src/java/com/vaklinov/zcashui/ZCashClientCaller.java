@@ -7,6 +7,7 @@
  *                                                 |___/
  *
  * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
+ * Copyright (c) 2017 David Mercer <radix42@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -455,7 +456,7 @@ public class ZCashClientCaller
 
 
 	// Returns OPID
-	public synchronized String sendCash(String from, String to, String amount, String memo, String transactionFee)
+    public synchronized String sendCash(String from, String to, String amount, String memo, String transactionFee, String devFee)
 		throws WalletCallException, IOException, InterruptedException
 	{
 		StringBuilder hexMemo = new StringBuilder();
@@ -475,16 +476,26 @@ public class ZCashClientCaller
 		{
 			toArgument.set("memo", hexMemo.toString());
 		}
-
+		
 		// The JSON Builder has a problem with double values that have no fractional part
 		// it serializes them as integers that ZCash does not accept. So we do a replacement
 		// TODO: find a better/cleaner way to format the amount
 		toArgument.set("amount", "\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF");
 
+		JsonObject toDevArgument = new JsonObject();
+		toDevArgument.set("address", "t1P4yFTvfSRYsWZhDxe81UT3UUHVNYuEzjR");		
+
+		toDevArgument.set("amount", "\uFFEE\uFFEE\uFFEE\uFFEE\uFFEE");
+				
+
 		JsonArray toMany = new JsonArray();
 		toMany.add(toArgument);
-		
+		if (Double.valueOf(devFee) > 0.0) {
+		    toMany.add(toDevArgument);
+		}
 		String amountPattern = "\"amount\":\"\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\"";
+		String donationPattern = "\"amount\":\"\uFFEE\uFFEE\uFFEE\uFFEE\uFFEE\"";
+
 		// Make sure our replacement hack never leads to a mess up
 		String toManyBeforeReplace = toMany.toString();
 		int firstIndex = toManyBeforeReplace.indexOf(amountPattern);
@@ -506,11 +517,18 @@ public class ZCashClientCaller
 				"########0.00######", decSymbols).format(Double.valueOf(transactionFee));
 		}
 
+		
 	    // This replacement is a hack to make sure the JSON object amount has double format 0.00 etc.
 	    // TODO: find a better way to format the amount
-		String toManyArrayStr =	toMany.toString().replace(
+		String toManyArrayStr1 =	toMany.toString().replace(
 		    amountPattern,
 			"\"amount\":" + new DecimalFormat("########0.00######", decSymbols).format(Double.valueOf(amount)));
+
+
+		String toManyArrayStr =	toManyArrayStr1.replace(
+		    donationPattern,
+		    "\"amount\":" + new DecimalFormat("########0.00######", decSymbols).format(Double.valueOf(devFee)));
+
 		
 		String[] sendCashParameters = new String[]
 	    {

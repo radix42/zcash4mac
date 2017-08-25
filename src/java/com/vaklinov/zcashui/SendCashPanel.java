@@ -6,7 +6,8 @@
  * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
  *                                                 |___/
  *
- * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
+ * Copyright (c) 2016-2017 Ivan Vaklinov <ivan@vaklinov.com>
+ * Copyright (c) 2016-2017 David Mercer <radix42@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -94,7 +95,7 @@ public class SendCashPanel
 	private JTextField destinationAmountField  = null;
 	private JTextField destinationMemoField    = null;	
 	private JTextField transactionFeeField     = null;	
-	
+        private JTextField transactiondonationField = null;
 	private JButton    sendButton              = null;
 	
 	private JPanel       operationStatusPanel        = null;
@@ -181,7 +182,7 @@ public class SendCashPanel
 
         // Panel for xtn fee
 		JPanel feePanel = new JPanel(new BorderLayout());
-		feePanel.add(new JLabel("Transaction fee:"), BorderLayout.NORTH);
+		feePanel.add(new JLabel("Miner Txn fee:"), BorderLayout.NORTH);
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(transactionFeeField = new JTextField(13));
 		transactionFeeField.setText("0.0001"); // Default value
@@ -189,42 +190,27 @@ public class SendCashPanel
 		tempPanel.add(new JLabel(" ZEC"));
 		feePanel.add(tempPanel, BorderLayout.SOUTH);
 
-        // add xtn fee to UI panel
+		// Donations make the world go round!!!!! And they keep David fed and happy, which makes the world go round
+		JPanel donationPanel       = new JPanel(new BorderLayout());
+		donationPanel.add(new JLabel("Wallet Dev Fee:"), BorderLayout.NORTH);
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		tempPanel.add(transactiondonationField = new JTextField(13));
+		transactiondonationField.setText("0.0001"); // Default value
+		transactiondonationField.setHorizontalAlignment(SwingConstants.RIGHT);
+		tempPanel.add(new JLabel(" ZEC    "));
+		donationPanel.add(tempPanel, BorderLayout.SOUTH);
+
+		// add xtn fee to UI panel
 		amountAndFeePanel.add(amountPanel);
 		amountAndFeePanel.add(feePanel);
+		amountAndFeePanel.add(donationPanel);
 		sendCashPanel.add(amountAndFeePanel);		
 		
 		dividerLabel = new JLabel("   ");
 		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
 		sendCashPanel.add(dividerLabel);
 
-		// Donations make the world go round!!!!! And they keep David fed and happy, which makes the world go round
-		JPanel donationPanel       = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		JPanel donationAmountPanel = new JPanel(new BorderLayout());
-		donationPanel.add(new JLabel("Per Transaction Donation:"), BorderLayout.NORTH);
-
-		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(destinationAmountField = new JTextField(13));
-		destinationAmountField.setHorizontalAlignment(SwingConstants.RIGHT);
-		tempPanel.add(new JLabel(" ZEC    "));
-		donationPanel.add(tempPanel, BorderLayout.SOUTH);
-
-        // Panel for donation
-		JPanel donationPanel = new JPanel(new BorderLayout());
-		donationPanel.add(new JLabel("Donation:"), BorderLayout.NORTH);
-		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(transactiondonationField = new JTextField(13));
-		transactiondonationField.setText("0.0001"); // Default value
-		transactiondonationField.setHorizontalAlignment(SwingConstants.RIGHT);
-		tempPanel.add(new JLabel(" ZEC"));
-		donationPanel.add(tempPanel, BorderLayout.SOUTH);
-
-        // add xtn fee to UI panel
-		amountAndFeePanel.add(amountPanel);
-		donationAmountPanel.add(donationPanel);
-
 		sendCashPanel.add(amountAndFeePanel);
-		sendCashPanel.add(donationAmountPanel);
 		
 		dividerLabel = new JLabel("   ");
 		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
@@ -425,6 +411,7 @@ public class SendCashPanel
 		final String destinationAddress = this.destinationAddressField.getText();
 		final String memo = this.destinationMemoField.getText();
 		final String amount = this.destinationAmountField.getText();
+		final String donation = this.transactiondonationField.getText();
 		final String fee = this.transactionFeeField.getText();
 
 		// Verify general correctness.
@@ -478,6 +465,20 @@ public class SendCashPanel
 			}
 		}
 
+		if ((donation == null) || (donation.trim().length() <= 0))
+		{
+		    // TODO: Nag the user!
+		} else 
+		{
+			try 
+			{
+				double d = Double.valueOf(donation);
+			} catch (NumberFormatException nfe)
+			{
+				errorMessage = "Wallet dev fee is invalid; it is not a number.";				
+			}
+		}
+
 
 		if (errorMessage != null)
 		{
@@ -503,7 +504,7 @@ public class SendCashPanel
 		}
 		
 		// Call the wallet send method
-		operationStatusID = this.clientCaller.sendCash(sourceAddress, destinationAddress, amount, memo, fee);
+		operationStatusID = this.clientCaller.sendCash(sourceAddress, destinationAddress, amount, memo, fee, donation);
 				
 		// Disable controls after send
 		sendButton.setEnabled(false);
@@ -512,7 +513,7 @@ public class SendCashPanel
 		destinationAmountField.setEnabled(false);
 		destinationMemoField.setEnabled(false);
 		transactionFeeField.setEnabled(false);
-		
+		transactiondonationField.setEnabled(false);
 		// Start a timer to update the progress of the operation
 		operationStatusCounter = 0;
 		operationStatusTimer = new Timer(2000, new ActionListener() {
@@ -567,6 +568,7 @@ public class SendCashPanel
 						balanceAddressCombo.setEnabled(true);
 						destinationAddressField.setEnabled(true);
 						destinationAmountField.setEnabled(true);
+						transactiondonationField.setEnabled(true);
 						transactionFeeField.setEnabled(true);
 						destinationMemoField.setEnabled(true);
 					} else
