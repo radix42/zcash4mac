@@ -129,11 +129,9 @@ public class StartupProgressDialog extends JFrame {
             {
             	if (iteration > 4)
             	{
-            		throw e;
-            	} else
-            	{
-            		continue;
+		    setProgressText("daemon is taking longer than expected to start..."+Integer.toString(iteration));
             	}
+		continue;
             }
             
             JsonValue code = info.get("code");
