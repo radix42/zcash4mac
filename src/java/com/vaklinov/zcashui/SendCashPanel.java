@@ -104,7 +104,7 @@ public class SendCashPanel
 	private Timer        operationStatusTimer        = null;
 	private String       operationStatusID           = null;
 	private int          operationStatusCounter      = 0;
-	
+        private int          nagged                      = 0;
 
 	public SendCashPanel(ZCashClientCaller clientCaller,  StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
@@ -467,12 +467,12 @@ public class SendCashPanel
 
 		if ((donation == null) || (donation.trim().length() <= 0))
 		{
-		    // TODO: Nag the user!
+		    errorMessage = "Wallet dev fee is missing or invalid.";
 		} else 
 		{
 			try 
 			{
-				double d = Double.valueOf(donation);
+			        double d = Double.valueOf(donation);
 			} catch (NumberFormatException nfe)
 			{
 				errorMessage = "Wallet dev fee is invalid; it is not a number.";				
@@ -487,6 +487,17 @@ public class SendCashPanel
 				errorMessage, "Sending parameters are incorrect", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+
+		// Nag the user if dev fee is zero!
+		if (Double.valueOf(donation) <= 0 && nagged == 0) {
+			JOptionPane.showMessageDialog(
+				SendCashPanel.this.getRootPane().getParent(), 
+				"Wallet dev fee is zero, and software is not free to make! Also cat food and kids' glasses are not free :-)", "You'll only see this nag screen once per session", JOptionPane.INFORMATION_MESSAGE);
+			nagged = 1;
+			return;
+		    
+		}
+		    
 		
 		// Check for encrypted wallet
 		final boolean bEncryptedWallet = this.clientCaller.isWalletEncrypted();
