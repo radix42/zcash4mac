@@ -6,6 +6,7 @@
  * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
  *                                                 |___/
  *
+ * Copyright (c) 2017 David Mercer <david@mercerweiss.com>
  * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -128,9 +129,9 @@ public class TransactionTable
 						txID = txID.replaceAll("\"", ""); // In case it has quotes
 						
 						LOG.fine("Transaction ID for block explorer is: " + txID);
-						// https://explorer.zcha.in/transactions/<ID>
+						// https://zcashnetwork.info/tx/<ID>
 						Desktop.getDesktop().browse(
-							new URL("https://explorer.zcha.in/transactions/" + txID).toURI());
+							new URL("https://zcashnetwork.info/tx/" + txID).toURI());
 					} catch (Exception ex)
 					{
 						LOG.log(Level.WARNING, "", ex);
