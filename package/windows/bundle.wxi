@@ -7,7 +7,7 @@
       <CreateFolder/>
       <RemoveFolder Id="RemoveDir0" On="uninstall" />
         <RegistryKey Root="HKCU"  Key="Software\Unknown\zcash4win" Action="createAndRemoveOnUninstall">
-         <RegistryValue Name="Version" Value="1.0.11" Type="string" KeyPath="yes"/>
+         <RegistryValue Name="Version" Value="1.0.12" Type="string" KeyPath="yes"/>
        </RegistryKey>
        <File Id="FileId1" Name="license.txt"  Source="license.txt" ProcessorArchitecture="x64">
        </File>

@@ -3,7 +3,7 @@ default: winapp ;
 
 APPNAME=zcash4win
 BUILD ?= $(shell git rev-list HEAD | wc -l|tr -d [:space:])
-SHORTVERSION = 1.0.11
+SHORTVERSION = 1.0.12
 VERSION ?= $(SHORTVERSION)-$(BUILD)
 winapp:
 	cp src/build/build.xml src/build/build.xml.bak

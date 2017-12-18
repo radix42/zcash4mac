@@ -2,8 +2,8 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Product Id="a6a11bac-bfdf-4140-8213-49078ee5f14b" Name="zcash4win" 
-             Language="1033" Version="1.0.11"
-             Manufacturer="Unknown" 
+             Language="1033" Version="1.0.12"
+             Manufacturer="MercerWeiss Consulting" 
              UpgradeCode="d6e3211f-3831-4424-82a6-fe0d8a0edf89">
         <Package Description="zcash4win" Comments="None"
                  InstallerVersion="200" Compressed="yes"
