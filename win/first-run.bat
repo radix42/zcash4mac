@@ -12,6 +12,7 @@ IF NOT EXIST %AppData%\Zcash\zcash.conf (
     echo daemon=1 
     echo showmetrics=0 
     echo gen=0 
+    echo disabledeprecation=1.0.12
     ) > %AppData%\Zcash\zcash.conf
 ) 
 
