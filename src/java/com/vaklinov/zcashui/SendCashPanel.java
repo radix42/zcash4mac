@@ -194,7 +194,7 @@ public class SendCashPanel
 		warningPanel.setLayout(new BorderLayout(7, 3));
 		JLabel warningL = new JLabel(
 				"<html><span style=\"font-size:8px;\">" +
-				" * When sending cash from a T (Transparent) address, the remining unspent balance is sent to another " +
+				" * When sending cash from a T (Transparent) address, the remaining unspent balance is sent to another " +
 				"auto-generated T address. When sending from a Z (Private) address, the remining unspent balance remains with " +
 				"the Z address. In both cases the original sending address cannot be used for sending again until the " +
 				"transaction is confirmed. The address is temporarily removed from the list! Freshly mined coins may only "+
