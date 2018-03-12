@@ -2,11 +2,11 @@
 <Include>
  <Directory Id="TARGETDIR" Name="SourceDir">
   <Directory Id="ProgramFiles64Folder" Name="PFiles">
-   <Directory Id="APPLICATIONFOLDER" Name="zcash4win">
+   <Directory Id="APPLICATIONFOLDER" Name="winzec">
      <Component Id="comp0" DiskId="1" Guid="98e2309a-d490-48d7-a732-3e0dad682a08" Win64="yes">
       <CreateFolder/>
       <RemoveFolder Id="RemoveDir0" On="uninstall" />
-        <RegistryKey Root="HKCU"  Key="Software\Unknown\zcash4win" Action="createAndRemoveOnUninstall">
+        <RegistryKey Root="HKCU"  Key="Software\Unknown\winzec" Action="createAndRemoveOnUninstall">
          <RegistryValue Name="Version" Value="1.0.12" Type="string" KeyPath="yes"/>
        </RegistryKey>
        <File Id="FileId1" Name="license.txt"  Source="license.txt" ProcessorArchitecture="x64">
@@ -19,8 +19,8 @@
        </File>
        <File Id="FileId5" Name="packager.dll"  Source="packager.dll" ProcessorArchitecture="x64">
        </File>
-       <File Id="LauncherId" Name="zcash4win.exe"  Source="zcash4win.exe" ProcessorArchitecture="x64">
-         <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="zcash4win" Advertise="no" Icon="StartMenuIcon.exe" IconIndex="0" />
+       <File Id="LauncherId" Name="winzec.exe"  Source="winzec.exe" ProcessorArchitecture="x64">
+         <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="winzec" Advertise="no" Icon="StartMenuIcon.exe" IconIndex="0" />
        </File>
        <File Id="FileId6" Name="zcash4win.ico"  Source="zcash4win.ico" ProcessorArchitecture="x64">
        </File>
