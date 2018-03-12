@@ -61,7 +61,7 @@ public class StartupProgressDialog extends JFrame {
         contentPane.add(imageLabel, BorderLayout.NORTH);
 		JLabel zcashWalletLabel = new JLabel(
 			"<html><span style=\"font-style:italic;font-weight:bold;font-size:25px\">" + 
-		    "zcash4win</span></html>");
+		    "WinZEC</span></html>");
 		zcashWalletLabel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
 		contentPane.add(zcashWalletLabel, BorderLayout.CENTER);
         contentPane.add(southPanel, BorderLayout.SOUTH);
@@ -211,7 +211,7 @@ public class StartupProgressDialog extends JFrame {
         System.out.println("performing Win Bundle-specific launch");
 	String programFiles = System.getenv("PROGRAMFILES");
 	File pf = new File(programFiles);
-	File bundlePath = new File(pf, "zcash4win/app");
+	File bundlePath = new File(pf, "winzec/app");
         bundlePath = bundlePath.getCanonicalFile();
         
         // run "first-run.bat"

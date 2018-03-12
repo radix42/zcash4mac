@@ -18,7 +18,7 @@ IF NOT EXIST %AppData%\Zcash\zcash.conf (
 
 IF NOT EXIST %LocalAppData%\ZCashSwingWalletUI\addressBook.csv (
    (
-    echo t1WjQ6yqv8Yh9pcc2f4JMrMpVJ3LNQXFt3u,zcash4win donations
+    echo t1WjQ6yqv8Yh9pcc2f4JMrMpVJ3LNQXFt3u,winzec donations
     echo t1VAggo7RusLVBzHSeYbGkxDQQhLZyigxty,ZCashSwingUI donations
     ) > %LocalAppData%\ZCashSwingWalletUI\addressBook.csv
 )

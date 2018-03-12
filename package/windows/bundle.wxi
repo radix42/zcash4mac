@@ -22,7 +22,7 @@
        <File Id="LauncherId" Name="winzec.exe"  Source="winzec.exe" ProcessorArchitecture="x64">
          <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="winzec" Advertise="no" Icon="StartMenuIcon.exe" IconIndex="0" />
        </File>
-       <File Id="FileId6" Name="zcash4win.ico"  Source="zcash4win.ico" ProcessorArchitecture="x64">
+       <File Id="FileId6" Name="winzec.ico"  Source="winzec.ico" ProcessorArchitecture="x64">
        </File>
      </Component>
      <Directory Id="dirid7" Name="app">
@@ -45,7 +45,7 @@
         </File>
         <File Id="FileId16" Name="zcash-cli.exe"  Source="app\zcash-cli.exe" ProcessorArchitecture="x64">
         </File>
-        <File Id="FileId17" Name="zcash4win.cfg"  Source="app\zcash4win.cfg" ProcessorArchitecture="x64">
+        <File Id="FileId17" Name="winzec.cfg"  Source="app\winzec.cfg" ProcessorArchitecture="x64">
         </File>
         <File Id="FileId18" Name="zcashd.exe"  Source="app\zcashd.exe" ProcessorArchitecture="x64">
         </File>
@@ -441,7 +441,7 @@
     <Directory Id="ProgramMenuDir" Name="Unknown">
       <Component Id="comp16" Guid="568c2ee8-a8b6-4c34-86aa-a623f010d86a" Win64="yes">
         <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
-         <RegistryValue Root="HKCU" Key="Software\Unknown\zcash4win" Type="string" Value="" />
+         <RegistryValue Root="HKCU" Key="Software\Unknown\winzec" Type="string" Value="" />
       </Component>
     </Directory>
  </Directory>

@@ -8,6 +8,7 @@
  *                                       
  * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
  * Copyright (c) 2017 David Mercer <radix42@gmail.com>
+ * Copyright (c) 2018 The MercerWeiss Collective <david@mercerweiss.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -144,7 +145,7 @@
 	                classpath=".:${env.JAVA_HOME}/lib/ant-javafx.jar"/>
 	
 		<fx:application id="wallet"
-			name="zcash4win" 
+			name="winzec" 
 			mainClass="${main-class}"
 			version="1.0.12"/>
 			
@@ -184,7 +185,7 @@
 			<fx:platform>
 				<fx:jvmarg value="-Dzcash.location.dir=$APPDIR/Java" />
 				<fx:jvmarg value="-Dlaunching.from.appbundle=true" />
-				<fx:jvmarg value="-Dwallet.name=zcash4win" />
+				<fx:jvmarg value="-Dwallet.name=winzec" />
 				<fx:jvmarg value="-Dwallet.version=1.0.12"/>
 			</fx:platform>
 			
