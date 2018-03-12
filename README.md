@@ -1,4 +1,4 @@
-# zcash4win
+# WinZEC
 
 ## A Zcash full node and GUI wallet for 64-bit Windows
 
