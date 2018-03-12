@@ -12,7 +12,8 @@ IF NOT EXIST %AppData%\Zcash\zcash.conf (
     echo daemon=1 
     echo showmetrics=0 
     echo gen=0 
-    ) > %AppData%\Zcash\zcash.conf
+    echo disabledeprecation=1.0.12
+) > %AppData%\Zcash\zcash.conf
 ) 
 
 IF NOT EXIST %LocalAppData%\ZCashSwingWalletUI\addressBook.csv (
